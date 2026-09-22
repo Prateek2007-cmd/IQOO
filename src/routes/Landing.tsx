@@ -289,8 +289,8 @@ function Hero() {
         <div
           className="absolute left-1/2 -translate-x-1/2 transition-opacity duration-700"
           style={{
-            width: "clamp(320px, 42vw, 580px)",
-            height: "clamp(130px, 18vh, 220px)",
+            width: "clamp(360px, 46vw, 640px)",
+            height: "clamp(140px, 20vh, 240px)",
             bottom: "clamp(12%, 18vh, 24%)",
             background:
               "radial-gradient(ellipse 65% 55% at 50% 90%, rgba(0, 225, 255, 0.28) 0%, rgba(0, 160, 255, 0.09) 45%, transparent 75%)",
@@ -303,8 +303,8 @@ function Hero() {
         <div
           className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
           style={{
-            width: "clamp(320px, 38vw, 500px)",
-            height: "clamp(200px, 28vh, 320px)",
+            width: "clamp(340px, 42vw, 540px)",
+            height: "clamp(220px, 30vh, 340px)",
             bottom: "clamp(12%, 18vh, 24%)",
             background:
               "radial-gradient(ellipse 60% 85% at 50% 100%, rgba(0, 220, 255, 0.18) 0%, rgba(0, 150, 255, 0.06) 55%, transparent 80%)",
@@ -316,11 +316,11 @@ function Hero() {
         <div
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-700"
           style={{
-            width: "clamp(420px, 50vw, 680px)",
-            height: "clamp(420px, 50vw, 680px)",
+            width: "clamp(480px, 58vw, 760px)",
+            height: "clamp(480px, 58vw, 760px)",
             background:
               "radial-gradient(circle at 50% 50%, rgba(0, 215, 255, 0.09) 0%, rgba(15, 60, 110, 0.035) 45%, transparent 70%)",
-            filter: "blur(30px)",
+            filter: "blur(32px)",
             opacity: isHovered ? 1 : 0.8,
           }}
         />
@@ -352,12 +352,13 @@ function Hero() {
         <div
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
-          className="pointer-events-auto relative group cursor-pointer transition-transform duration-500 hover:scale-[1.025]"
+          className="pointer-events-auto relative group cursor-pointer transition-transform duration-500 hover:scale-[1.03]"
           style={{
-            width: "clamp(340px, 42vw, 540px)",
-            height: "clamp(340px, 42vw, 540px)",
-            maxWidth: "540px",
-            maxHeight: "540px",
+            width: "clamp(400px, 48vw, 640px)",
+            height: "clamp(400px, 48vw, 640px)",
+            maxWidth: "640px",
+            maxHeight: "640px",
+            transform: "scale(1.18)",
           }}
         >
           <NeoBrainCore
