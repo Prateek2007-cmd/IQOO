@@ -58,23 +58,70 @@ export default function SettingsPage() {
     <div className="relative">
       {!isDesktop ? <MobileTopBar title="Settings" tagline="Control how NeoBrain works." /> : null}
 
-      <div className={isDesktop ? "mx-auto max-w-[1240px] px-8 py-8" : "px-5 pb-8 pt-5"}>
+      <div className={isDesktop ? "mx-auto max-w-[1320px] px-8 py-8" : "px-5 pb-8 pt-5"}>
         {isDesktop ? (
           <header className="mb-8">
-            <TechLabel tone="cyan">System Configuration</TechLabel>
-            <h1 className="mt-2 title-xl">Control how NeoBrain works.</h1>
-            <p className="mt-2 max-w-[66ch] text-[13.5px] leading-relaxed text-txt-secondary">
+            <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#00D1FF]">
+              ◆ SYSTEM CONFIGURATION
+            </div>
+            <h1 className="mt-2 font-display text-[38px] font-semibold leading-[1.05] text-[#E2E8F0]">
+              Control how NeoBrain works.
+            </h1>
+            <p className="mt-3 max-w-[66ch] text-[13px] leading-relaxed text-[#94A3B8]">
               Configure awareness heuristics, memory retention thresholds, sovereign processing limits, and hardware density.
               All parameters take effect instantly on this device.
             </p>
           </header>
         ) : null}
 
-        <div className="grid gap-6 lg:grid-cols-2">
-          {/* Awareness heuristics */}
-          <Panel className="p-6">
-            <SectionHeading label="Awareness" title="Perception & Background Scanning" />
-            <div className="mt-3 divide-y divide-border">
+        {/* Profile hero strip */}
+        <div className="mb-6 flex items-center gap-4 rounded-2xl border border-[#334155]/40 bg-[#0B1320]/50 p-5 backdrop-blur-xl shadow-[0_10px_30px_-10px_rgba(0,0,0,0.8)]">
+          <div className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-tr from-[#3882F6] to-[#00D1FF] shadow-[0_0_20px_rgba(0,209,255,0.5)]">
+            <span className="text-[22px] font-bold text-black">
+              {session.name ? session.name[0].toUpperCase() : "P"}
+            </span>
+            <div className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-[#020407] bg-[#10B981] shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="text-[16px] font-semibold text-[#E2E8F0]">{session.name || "Prateek"}</div>
+            <div className="mt-0.5 flex items-center gap-3 font-mono text-[10px] text-[#64748B]">
+              <span>Session active</span>
+              <span className="h-px w-3 bg-[#334155]/50" />
+              <span>
+                Since{" "}
+                {new Date(session.startedAt).toLocaleTimeString(undefined, {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
+              <span className="h-px w-3 bg-[#334155]/50" />
+              <span>{counts.memories} memories</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => {
+                signOut();
+                navigate("/auth?returnTo=%2Fapp", { replace: true });
+              }}
+            >
+              <LogOut size={13} /> Lock Session
+            </Button>
+          </div>
+        </div>
+
+        <div className="grid gap-5 lg:grid-cols-2">
+          {/* ── Awareness ─────────────────────────────────────── */}
+          <div className="rounded-2xl border border-[#334155]/30 bg-[#0B1320]/40 p-6 backdrop-blur-sm">
+            <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-[#00D1FF]">
+              ✦ AWARENESS HEURISTICS
+            </div>
+            <h2 className="mt-1.5 font-display text-[18px] font-semibold text-[#E2E8F0]">
+              Perception & Background Scanning
+            </h2>
+            <div className="mt-4 divide-y divide-[#334155]/30">
               <Switch
                 label="Always Available"
                 description="Keeps the local vector and tokenizer pipeline warm in memory for instantaneous recall."
@@ -95,13 +142,13 @@ export default function SettingsPage() {
               />
               <div className="flex items-center justify-between gap-4 py-3.5">
                 <div>
-                  <div className="text-[13.5px] font-semibold text-txt-primary">Scan Interval</div>
-                  <div className="mt-0.5 text-[11.5px] text-txt-muted">
+                  <div className="text-[13px] font-medium text-[#E2E8F0]">Scan Interval</div>
+                  <div className="mt-0.5 text-[11px] text-[#64748B]">
                     Frequency of automated folder re-indexing
                   </div>
                 </div>
                 <select
-                  className="input h-10 w-[140px] bg-panel border-border font-mono text-[12px]"
+                  className="h-9 w-[130px] rounded-lg border border-[#334155]/40 bg-[#020407]/60 px-3 font-mono text-[12px] text-[#E2E8F0] outline-none transition-all focus:border-[#00D1FF]/40"
                   value={awareness.scanIntervalMinutes}
                   onChange={(event) =>
                     updateSettings({ awareness: { scanIntervalMinutes: Number(event.target.value) } })
@@ -109,7 +156,7 @@ export default function SettingsPage() {
                   aria-label="Scan interval"
                 >
                   {[5, 10, 30, 60].map((minutes) => (
-                    <option key={minutes} value={minutes} className="bg-panel">
+                    <option key={minutes} value={minutes} className="bg-[#0A0F1C]">
                       {minutes} minutes
                     </option>
                   ))}
@@ -126,12 +173,17 @@ export default function SettingsPage() {
                 />
               </div>
             ) : null}
-          </Panel>
+          </div>
 
-          {/* Memory classification */}
-          <Panel className="p-6">
-            <SectionHeading label="Memory" title="Retention & Semantic Filtering" />
-            <div className="mt-3 divide-y divide-border">
+          {/* ── Memory ────────────────────────────────────────── */}
+          <div className="rounded-2xl border border-[#334155]/30 bg-[#0B1320]/40 p-6 backdrop-blur-sm">
+            <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-[#885CF6]">
+              ✦ MEMORY CLASSIFICATION
+            </div>
+            <h2 className="mt-1.5 font-display text-[18px] font-semibold text-[#E2E8F0]">
+              Retention & Semantic Filtering
+            </h2>
+            <div className="mt-4 divide-y divide-[#334155]/30">
               <Switch
                 label="Autonomous Memory Capture"
                 description="Automatically files high-signal captures into your second brain without manual confirmation prompts."
@@ -152,39 +204,45 @@ export default function SettingsPage() {
               />
               <div className="flex items-center justify-between gap-4 py-3.5">
                 <div>
-                  <div className="text-[13.5px] font-semibold text-txt-primary">Default Retention Lifetime</div>
-                  <div className="mt-0.5 text-[11.5px] text-txt-muted">
+                  <div className="text-[13px] font-medium text-[#E2E8F0]">Default Retention Lifetime</div>
+                  <div className="mt-0.5 text-[11px] text-[#64748B]">
                     Lifespan before candidate memories transition to archive
                   </div>
                 </div>
                 <select
-                  className="input h-10 w-[140px] bg-panel border-border font-mono text-[12px]"
+                  className="h-9 w-[130px] rounded-lg border border-[#334155]/40 bg-[#020407]/60 px-3 font-mono text-[12px] text-[#E2E8F0] outline-none transition-all focus:border-[#00D1FF]/40"
                   value={memory.retentionDays}
                   onChange={(event) => updateSettings({ memory: { retentionDays: Number(event.target.value) } })}
                   aria-label="Memory retention"
                 >
                   {[7, 30, 90, 365].map((days) => (
-                    <option key={days} value={days} className="bg-panel">
+                    <option key={days} value={days} className="bg-[#0A0F1C]">
                       {days} days
                     </option>
                   ))}
                 </select>
               </div>
             </div>
-            <div className="divider my-4" />
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="micro-module text-cyanx">{counts.memories} memories stored</span>
-              <span className="micro-module text-amberx">{counts.candidates} awaiting review</span>
-              <Link to="/app/memory" className="font-mono text-[11px] text-cyanx hover:underline ml-auto">
+            <div className="my-4 h-px bg-gradient-to-r from-transparent via-[#334155]/50 to-transparent" />
+            <div className="flex items-center gap-3 font-mono text-[11px]">
+              <span className="text-[#00D1FF]">{counts.memories} stored</span>
+              <span className="h-px w-3 bg-[#334155]/50" />
+              <span className="text-[#F59E0B]">{counts.candidates} awaiting</span>
+              <Link to="/app/memory" className="ml-auto text-[#00D1FF] hover:underline">
                 Review memory graph →
               </Link>
             </div>
-          </Panel>
+          </div>
 
-          {/* Audio & privacy */}
-          <Panel className="p-6">
-            <SectionHeading label="Audio & Privacy" title="Sovereign Processing Limits" />
-            <div className="mt-3 divide-y divide-border">
+          {/* ── Privacy & Processing ──────────────────────────── */}
+          <div className="rounded-2xl border border-[#334155]/30 bg-[#0B1320]/40 p-6 backdrop-blur-sm">
+            <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-[#10B981]">
+              ✦ SOVEREIGN PROCESSING
+            </div>
+            <h2 className="mt-1.5 font-display text-[18px] font-semibold text-[#E2E8F0]">
+              Audio & Privacy Limits
+            </h2>
+            <div className="mt-4 divide-y divide-[#334155]/30">
               <Switch
                 label="Local Processing Exclusively"
                 description="Enforces strict local compute boundaries: remote inference endpoints are blocked."
@@ -202,41 +260,46 @@ export default function SettingsPage() {
                 onChange={(next) => updateSettings({ privacy: { saveRawAudio: next, rawAudioStored: next } })}
               />
             </div>
-            <div className="divider my-4" />
-            <div className="space-y-3 font-mono text-[12px]">
+            <div className="my-4 h-px bg-gradient-to-r from-transparent via-[#334155]/50 to-transparent" />
+            <div className="space-y-2.5 font-mono text-[12px]">
               <div className="flex items-center justify-between">
-                <span className="flex items-center gap-2 text-txt-secondary">
-                  <Cpu size={13} className="text-cyanx" /> {providers.inference.label}
+                <span className="flex items-center gap-2 text-[#94A3B8]">
+                  <Cpu size={12} className="text-[#00D1FF]" /> {providers.inference.label}
                 </span>
-                <span className="text-greenx uppercase font-semibold">{providers.inference.location}</span>
+                <span className="text-[10px] font-semibold uppercase text-[#10B981]">{providers.inference.location}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="flex items-center gap-2 text-txt-secondary">
-                  <Waves size={13} className="text-bluex" /> {providers.speech.label}
+                <span className="flex items-center gap-2 text-[#94A3B8]">
+                  <Waves size={12} className="text-[#3882F6]" /> {providers.speech.label}
                 </span>
-                <span className="text-greenx uppercase font-semibold">{providers.speech.location}</span>
+                <span className="text-[10px] font-semibold uppercase text-[#10B981]">{providers.speech.location}</span>
               </div>
             </div>
             <div className="mt-5">
-              <Button size="sm" variant="secondary" onClick={() => navigate("/app/privacy")}>
-                <Lock size={13} /> Open Laboratory Privacy Dashboard
+              <Button size="sm" variant="ghost" onClick={() => navigate("/app/privacy")}>
+                <Lock size={13} /> Open Privacy Dashboard
               </Button>
             </div>
-          </Panel>
+          </div>
 
-          {/* Appearance & Rendering */}
-          <Panel className="p-6">
-            <SectionHeading label="Appearance" title="Rendering & Spatial Density" />
-            <div className="mt-3 divide-y divide-border">
+          {/* ── Appearance ────────────────────────────────────── */}
+          <div className="rounded-2xl border border-[#334155]/30 bg-[#0B1320]/40 p-6 backdrop-blur-sm">
+            <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-[#F59E0B]">
+              ✦ RENDERING ENGINE
+            </div>
+            <h2 className="mt-1.5 font-display text-[18px] font-semibold text-[#E2E8F0]">
+              Appearance & Spatial Density
+            </h2>
+            <div className="mt-4 divide-y divide-[#334155]/30">
               <div className="flex items-center justify-between gap-4 py-3.5">
                 <div>
-                  <div className="text-[13.5px] font-semibold text-txt-primary">Reduced Motion</div>
-                  <div className="mt-0.5 text-[11.5px] text-txt-muted">
+                  <div className="text-[13px] font-medium text-[#E2E8F0]">Reduced Motion</div>
+                  <div className="mt-0.5 text-[11px] text-[#64748B]">
                     Honors system accessibility preference by default
                   </div>
                 </div>
                 <select
-                  className="input h-10 w-[150px] bg-panel border-border font-mono text-[12px]"
+                  className="h-9 w-[150px] rounded-lg border border-[#334155]/40 bg-[#020407]/60 px-3 font-mono text-[12px] text-[#E2E8F0] outline-none transition-all focus:border-[#00D1FF]/40"
                   value={appearance.reducedMotion === null ? "system" : appearance.reducedMotion ? "on" : "off"}
                   onChange={(event) =>
                     updateSettings({
@@ -248,15 +311,9 @@ export default function SettingsPage() {
                   }
                   aria-label="Reduced motion"
                 >
-                  <option value="system" className="bg-panel">
-                    System Default
-                  </option>
-                  <option value="on" className="bg-panel">
-                    Always Reduce
-                  </option>
-                  <option value="off" className="bg-panel">
-                    Never Reduce
-                  </option>
+                  <option value="system" className="bg-[#0A0F1C]">System Default</option>
+                  <option value="on" className="bg-[#0A0F1C]">Always Reduce</option>
+                  <option value="off" className="bg-[#0A0F1C]">Never Reduce</option>
                 </select>
               </div>
               <Switch
@@ -266,26 +323,31 @@ export default function SettingsPage() {
                 onChange={(next) => updateSettings({ appearance: { compactDensity: next } })}
               />
             </div>
-            <div className="mt-4 flex items-start gap-3">
-              <Palette size={14} className="mt-0.5 shrink-0 text-cyanx" />
-              <p className="text-[11.5px] leading-relaxed text-txt-muted">
+            <div className="mt-4 flex items-start gap-3 rounded-xl border border-[#334155]/20 bg-[#020407]/40 p-3.5">
+              <Palette size={13} className="mt-0.5 shrink-0 text-[#00D1FF]" />
+              <p className="text-[11px] leading-relaxed text-[#64748B]">
                 The 3D NeoBrain Core automatically throttles shader loops and particle emitters when reduced motion is
                 engaged.
               </p>
             </div>
-          </Panel>
+          </div>
 
-          {/* Profile card */}
-          <Panel className="p-6">
-            <SectionHeading label="Identity" title="Local Operator Profile" />
+          {/* ── Identity ──────────────────────────────────────── */}
+          <div className="rounded-2xl border border-[#334155]/30 bg-[#0B1320]/40 p-6 backdrop-blur-sm">
+            <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-[#64748B]">
+              ✦ LOCAL IDENTITY
+            </div>
+            <h2 className="mt-1.5 font-display text-[18px] font-semibold text-[#E2E8F0]">
+              Operator Profile
+            </h2>
             <div className="mt-4">
-              <label htmlFor="settings-name" className="label mb-2 block font-mono text-[11px] uppercase tracking-wider">
+              <label htmlFor="settings-name" className="mb-2 block font-mono text-[10px] uppercase tracking-[0.15em] text-[#64748B]">
                 Operator Display Name
               </label>
               <div className="flex gap-2">
                 <input
                   id="settings-name"
-                  className="input flex-1 bg-surface border-border font-medium"
+                  className="flex-1 rounded-lg border border-[#334155]/40 bg-[#020407]/60 px-3.5 py-2.5 text-[14px] font-medium text-[#E2E8F0] outline-none transition-all focus:border-[#00D1FF]/40 focus:shadow-[0_0_12px_-4px_rgba(0,209,255,0.3)]"
                   value={name}
                   onChange={(event) => setName(event.target.value)}
                 />
@@ -300,35 +362,30 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <div className="mt-5 space-y-3 font-mono text-[12px]">
-              <div className="flex items-center justify-between border-b border-border/50 pb-2.5">
-                <span className="flex items-center gap-2 text-txt-secondary">
-                  <User size={13} className="text-cyanx" /> Active Session
-                </span>
-                <span className="text-txt-primary font-semibold">{session.name || "Prateek"}</span>
-              </div>
-              <div className="flex items-center justify-between border-b border-border/50 pb-2.5">
-                <span className="flex items-center gap-2 text-txt-secondary">
-                  <ScanLine size={13} className="text-bluex" /> Initialized At
-                </span>
-                <span className="text-txt-muted">
-                  {new Date(session.startedAt).toLocaleTimeString(undefined, {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="flex items-center gap-2 text-txt-secondary">
-                  <ListChecks size={13} className="text-purplex" /> Voice Wake Engine
-                </span>
-                <span className="text-txt-muted">Offline Standby</span>
-              </div>
+            <div className="mt-5 space-y-2.5 font-mono text-[12px]">
+              {[
+                { icon: User, label: "Active Session", value: session.name || "Prateek", color: "text-[#00D1FF]" },
+                {
+                  icon: ScanLine,
+                  label: "Initialized At",
+                  value: new Date(session.startedAt).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }),
+                  color: "text-[#3882F6]",
+                },
+                { icon: ListChecks, label: "Voice Wake Engine", value: "Offline Standby", color: "text-[#885CF6]" },
+              ].map((row) => {
+                const Icon = row.icon;
+                return (
+                  <div key={row.label} className="flex items-center justify-between border-b border-[#334155]/25 pb-2.5">
+                    <span className="flex items-center gap-2 text-[#94A3B8]">
+                      <Icon size={12} className={row.color} /> {row.label}
+                    </span>
+                    <span className="text-[#E2E8F0] font-medium">{row.value}</span>
+                  </div>
+                );
+              })}
             </div>
 
-            <div className="divider my-5" />
-
-            <div className="flex flex-wrap gap-2">
+            <div className="mt-4 flex flex-wrap gap-2">
               <Button
                 size="sm"
                 variant="ghost"
@@ -339,54 +396,59 @@ export default function SettingsPage() {
                 <Bell size={13} />
                 {settings.profile.wakeWordEnabled ? "Disable Keyword Detector" : "Enable Keyword Detector"}
               </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => {
-                  signOut();
-                  navigate("/auth?returnTo=%2Fapp", { replace: true });
-                }}
-              >
-                <LogOut size={13} /> Lock Session
-              </Button>
             </div>
-          </Panel>
+          </div>
 
-          {/* Hardware & Diagnostics */}
-          <div className="space-y-6">
-            <Panel className="p-6">
-              <SectionHeading
-                label="Hardware Nodes"
-                title="Ecosystem Pairing"
-                action={
-                  <Link to="/app/devices" className="font-mono text-[11px] text-cyanx hover:underline">
-                    Manage →
-                  </Link>
-                }
-              />
-              <div className="mt-4 space-y-2.5 font-mono">
+          {/* ── Hardware & Build ───────────────────────────────── */}
+          <div className="space-y-5">
+            <div className="rounded-2xl border border-[#334155]/30 bg-[#0B1320]/40 p-6 backdrop-blur-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-[#64748B]">
+                    ✦ HARDWARE NODES
+                  </div>
+                  <h2 className="mt-1.5 font-display text-[18px] font-semibold text-[#E2E8F0]">
+                    Ecosystem Pairing
+                  </h2>
+                </div>
+                <Link to="/app/devices" className="font-mono text-[11px] text-[#00D1FF] hover:underline">
+                  Manage →
+                </Link>
+              </div>
+              <div className="mt-4 space-y-2">
                 {state.devices.map((device) => (
                   <div
                     key={device.id}
-                    className="flex items-center justify-between gap-4 rounded-xl border border-border bg-panel/50 px-4 py-3"
+                    className="flex items-center justify-between gap-4 rounded-xl border border-[#334155]/25 bg-[#020407]/40 px-4 py-3"
                   >
                     <div className="min-w-0">
-                      <div className="truncate text-[13px] font-semibold text-txt-primary">{device.name}</div>
-                      <div className="mt-0.5 text-[11px] text-txt-muted">
+                      <div className="truncate text-[13px] font-medium text-[#E2E8F0]">{device.name}</div>
+                      <div className="mt-0.5 text-[10px] text-[#64748B]">
                         {device.processingRole === "deep" ? "Deep Brain Node" : "Pocket Brain Node"} · {device.model}
                       </div>
                     </div>
-                    <span className="micro-module text-greenx border-greenx/30">
+                    <span
+                      className={`rounded-full border px-2 py-0.5 font-mono text-[10px] ${
+                        device.connectionStatus === "connected"
+                          ? "border-[#10B981]/30 bg-[#10B981]/10 text-[#10B981]"
+                          : "border-[#334155]/40 text-[#94A3B8]"
+                      }`}
+                    >
                       {device.connectionStatus === "connected" ? "SYNCED" : device.connectionStatus.toUpperCase()}
                     </span>
                   </div>
                 ))}
               </div>
-            </Panel>
+            </div>
 
-            <Panel className="p-6">
-              <SectionHeading label="System" title="Build & Engine Manifest" />
-              <div className="mt-4 space-y-2.5 font-mono text-[12px]">
+            <div className="rounded-2xl border border-[#334155]/30 bg-[#0B1320]/40 p-6 backdrop-blur-sm">
+              <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-[#64748B]">
+                ✦ ENGINE MANIFEST
+              </div>
+              <h2 className="mt-1.5 font-display text-[18px] font-semibold text-[#E2E8F0]">
+                Build & System Info
+              </h2>
+              <div className="mt-4 space-y-2 font-mono text-[12px]">
                 {[
                   { label: "Product Core", value: "NeoBrain Sovereign AI v2.4" },
                   { label: "Storage Engine", value: "IndexedDB / LocalStorage Encrypted" },
@@ -394,22 +456,21 @@ export default function SettingsPage() {
                   { label: "Inference Boundary", value: providers.inference.label },
                   { label: "Retrieval Topology", value: providers.retrieval.label },
                 ].map((row) => (
-                  <div key={row.label} className="flex items-center justify-between gap-4 border-b border-border/40 pb-2">
-                    <span className="text-txt-muted">{row.label}</span>
-                    <span className="text-txt-primary font-medium">{row.value}</span>
+                  <div key={row.label} className="flex items-center justify-between gap-4 border-b border-[#334155]/25 pb-2">
+                    <span className="text-[#64748B]">{row.label}</span>
+                    <span className="text-[#E2E8F0] font-medium">{row.value}</span>
                   </div>
                 ))}
               </div>
-              <div className="divider my-4" />
-              <div className="flex flex-wrap gap-2">
+              <div className="mt-4 flex flex-wrap gap-2">
                 <Button size="sm" variant="ghost" onClick={() => navigate("/app/boot")}>
                   <Gauge size={13} /> Replay Boot Diagnostics
                 </Button>
                 <Button size="sm" variant="ghost" onClick={() => navigate("/")}>
-                  <MonitorSmartphone size={13} /> View Public Cinematic Portal
+                  <MonitorSmartphone size={13} /> View Public Portal
                 </Button>
               </div>
-            </Panel>
+            </div>
           </div>
         </div>
       </div>

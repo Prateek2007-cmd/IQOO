@@ -142,6 +142,15 @@ export default function KnowledgePage() {
     memory: { stroke: "#885CF6", fill: "rgba(136, 92, 246, 0.25)", glow: "rgba(136, 92, 246, 0.5)" },
   };
 
+  const KIND_ICONS: Record<string, string> = {
+    project: "⬡",
+    person: "◎",
+    idea: "◇",
+    file: "▫",
+    decision: "◆",
+    memory: "○",
+  };
+
   const positions = useMemo(
     () => computeLayout(state.knowledge.nodes, state.knowledge.edges),
     [state.knowledge],
@@ -202,39 +211,44 @@ export default function KnowledgePage() {
     }, 1200);
   };
 
+  /* ----------------------------------------------------------------- Graph */
   const graph = (
-    <Panel className="relative overflow-hidden p-0" padded={false}>
-      <div className="flex flex-wrap items-center gap-2 border-b border-line-subtle px-4 py-3">
-        <div className="relative min-w-[180px] flex-1">
-          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-txt-muted" />
+    <div className="relative overflow-hidden rounded-2xl border border-[#334155]/40 bg-[#050a12]/80 backdrop-blur-xl shadow-[0_20px_50px_-20px_rgba(0,0,0,0.9)]">
+      {/* Graph toolbar */}
+      <div className="flex items-center justify-between gap-3 border-b border-[#334155]/30 px-4 py-2.5">
+        <div className="relative min-w-[160px] max-w-[280px] flex-1">
+          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#64748B]" />
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            className="input h-9 pl-9 text-[12.5px]"
-            placeholder="Search your knowledge…"
+            className="h-8 w-full rounded-lg border border-[#334155]/30 bg-[#020407]/60 pl-8 pr-3 text-[12px] text-[#E2E8F0] placeholder-[#64748B] outline-none transition-all focus:border-[#00D1FF]/40 focus:shadow-[0_0_12px_-4px_rgba(0,209,255,0.3)]"
+            placeholder="Search topology…"
             aria-label="Search knowledge graph"
           />
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1">
+          <span className="mr-2 font-mono text-[10px] text-[#64748B]">
+            {visibleNodes.length}/{positions.length}
+          </span>
           <button
             type="button"
-            className="icon-btn h-9 w-9"
+            className="grid h-7 w-7 place-items-center rounded-lg border border-[#334155]/40 bg-[#0A0F1C]/60 text-[#94A3B8] transition-all hover:border-[#00D1FF]/40 hover:text-[#00D1FF]"
             aria-label="Zoom out"
             onClick={() => setView((current) => ({ ...current, k: Math.max(0.5, current.k - 0.15) }))}
           >
-            <Minus size={14} />
+            <Minus size={12} />
           </button>
           <button
             type="button"
-            className="icon-btn h-9 w-9"
+            className="grid h-7 w-7 place-items-center rounded-lg border border-[#334155]/40 bg-[#0A0F1C]/60 text-[#94A3B8] transition-all hover:border-[#00D1FF]/40 hover:text-[#00D1FF]"
             aria-label="Zoom in"
             onClick={() => setView((current) => ({ ...current, k: Math.min(2.2, current.k + 0.15) }))}
           >
-            <Plus size={14} />
+            <Plus size={12} />
           </button>
           <button
             type="button"
-            className="icon-btn h-9 px-3 text-[11.5px]"
+            className="ml-1 grid h-7 place-items-center rounded-lg border border-[#334155]/40 bg-[#0A0F1C]/60 px-2.5 font-mono text-[10px] text-[#94A3B8] transition-all hover:border-[#00D1FF]/40 hover:text-[#00D1FF]"
             onClick={() => setView({ k: 1, x: 0, y: 0 })}
           >
             Reset
@@ -242,10 +256,18 @@ export default function KnowledgePage() {
         </div>
       </div>
 
+      {/* Graph canvas */}
       <div
-        className="relative touch-none bg-[radial-gradient(120%_90%_at_50%_0%,#0b1c27_0%,#050c13_70%)]"
-        style={{ height: isDesktop ? 520 : 380 }}
+        className="relative touch-none"
+        style={{ height: isDesktop ? 560 : 380 }}
       >
+        {/* Atmospheric background */}
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_50%,rgba(0,209,255,0.06)_0%,transparent_60%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(80%_60%_at_30%_70%,rgba(136,92,246,0.04)_0%,transparent_50%)]" />
+          <div className="absolute inset-0 tech-grid opacity-[0.15] [mask-image:radial-gradient(80%_80%_at_50%_50%,#000_0%,transparent_80%)]" />
+        </div>
+
         <svg
           ref={svgRef}
           viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
@@ -274,7 +296,25 @@ export default function KnowledgePage() {
           role="application"
           aria-label="Knowledge graph"
         >
+          <defs>
+            <filter id="edge-glow">
+              <feGaussianBlur stdDeviation="2" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+            <filter id="node-glow">
+              <feGaussianBlur stdDeviation="4" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+
           <g transform={`translate(${view.x} ${view.y}) scale(${view.k})`}>
+            {/* Edges */}
             {state.knowledge.edges.map((edge) => {
               const from = positions.find((node) => node.id === edge.from);
               const to = positions.find((node) => node.id === edge.to);
@@ -283,36 +323,34 @@ export default function KnowledgePage() {
               const active = selected === edge.from || selected === edge.to || hovered === edge.from || hovered === edge.to;
               return (
                 <g key={edge.id}>
+                  {/* Background glow line */}
+                  {active && (
+                    <line
+                      x1={from.x} y1={from.y} x2={to.x} y2={to.y}
+                      stroke="#00D1FF"
+                      strokeWidth={4}
+                      opacity={0.15}
+                      filter="url(#edge-glow)"
+                    />
+                  )}
                   <line
-                    x1={from.x}
-                    y1={from.y}
-                    x2={to.x}
-                    y2={to.y}
+                    x1={from.x} y1={from.y} x2={to.x} y2={to.y}
                     stroke={active ? "#00D1FF" : "rgba(51, 65, 85, 0.45)"}
-                    strokeWidth={active ? 1.8 : 0.8}
-                    opacity={faded ? 0.1 : active ? 0.85 : 0.4}
-                    style={{ filter: active ? "drop-shadow(0 0 6px rgba(0, 209, 255, 0.6))" : undefined }}
+                    strokeWidth={active ? 1.5 : 0.7}
+                    opacity={faded ? 0.08 : active ? 0.85 : 0.35}
+                    strokeDasharray={active ? "none" : "4 6"}
                   />
                   {active && (
-                    <circle r="2" fill="#00D1FF">
-                      <animate
-                        attributeName="cx"
-                        values={`${from.x};${to.x}`}
-                        dur="3s"
-                        repeatCount="indefinite"
-                      />
-                      <animate
-                        attributeName="cy"
-                        values={`${from.y};${to.y}`}
-                        dur="3s"
-                        repeatCount="indefinite"
-                      />
+                    <circle r="2.5" fill="#00D1FF" opacity={0.9}>
+                      <animate attributeName="cx" values={`${from.x};${to.x}`} dur="2.5s" repeatCount="indefinite" />
+                      <animate attributeName="cy" values={`${from.y};${to.y}`} dur="2.5s" repeatCount="indefinite" />
                     </circle>
                   )}
                 </g>
               );
             })}
 
+            {/* Nodes */}
             {positions.map((node) => {
               const faded = !visibleIds.has(node.id);
               const isSelected = node.id === selected;
@@ -323,66 +361,131 @@ export default function KnowledgePage() {
                 <g
                   key={node.id}
                   transform={`translate(${node.x} ${node.y})`}
-                  opacity={faded ? 0.15 : 1}
+                  opacity={faded ? 0.12 : 1}
                   className="cursor-pointer transition-all duration-200"
                   onClick={() => setSelected(node.id)}
                   onPointerEnter={() => setHovered(node.id)}
                   onPointerLeave={() => setHovered(null)}
                 >
-                  {/* Outer Glow Halo */}
+                  {/* Outer Atmosphere */}
                   <circle
-                    r={radius * (isSelected ? 2.6 : 2.0)}
+                    r={radius * (isSelected ? 3.0 : isHovered ? 2.4 : 1.8)}
                     fill={colors.glow}
-                    opacity={isSelected || isHovered ? 0.25 : 0.05}
+                    opacity={isSelected ? 0.2 : isHovered ? 0.12 : 0.03}
                   />
 
-                  {/* Base Circle */}
+                  {/* Orbital ring for selected */}
+                  {isSelected && (
+                    <circle
+                      r={radius * 2.0}
+                      fill="none"
+                      stroke="#00D1FF"
+                      strokeWidth={0.5}
+                      opacity={0.4}
+                      strokeDasharray="3 5"
+                    >
+                      <animateTransform
+                        attributeName="transform"
+                        type="rotate"
+                        values="0;360"
+                        dur="20s"
+                        repeatCount="indefinite"
+                      />
+                    </circle>
+                  )}
+
+                  {/* Node body */}
                   <circle
                     r={radius}
                     fill={isSelected ? colors.fill : "#0A0F1C"}
-                    stroke={isSelected ? "#00D1FF" : colors.stroke}
-                    strokeWidth={isSelected || isHovered ? 2 : 1.2}
-                    style={{
-                      filter: isSelected || isHovered ? `drop-shadow(0 0 8px ${colors.stroke})` : undefined,
-                    }}
+                    stroke={isSelected ? "#00D1FF" : isHovered ? colors.stroke : colors.stroke}
+                    strokeWidth={isSelected ? 2 : isHovered ? 1.5 : 1}
+                    filter={isSelected || isHovered ? "url(#node-glow)" : undefined}
                   />
 
-                  {/* Inner Project Nucleus */}
-                  {node.kind === "project" ? (
-                    <circle r={radius * 0.42} fill="#00D1FF" style={{ filter: "drop-shadow(0 0 4px #00D1FF)" }} />
-                  ) : null}
+                  {/* Inner nucleus for projects */}
+                  {node.kind === "project" && (
+                    <circle r={radius * 0.4} fill="#00D1FF" opacity={0.8}>
+                      <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" repeatCount="indefinite" />
+                    </circle>
+                  )}
+
+                  {/* Kind symbol */}
+                  {node.kind !== "project" && (
+                    <text
+                      textAnchor="middle"
+                      dominantBaseline="central"
+                      fontSize="8"
+                      fill={colors.stroke}
+                      opacity={0.7}
+                      style={{ pointerEvents: "none" }}
+                    >
+                      {KIND_ICONS[node.kind] || "◇"}
+                    </text>
+                  )}
 
                   {/* Label */}
                   <text
-                    y={radius + 15}
+                    y={radius + 16}
                     textAnchor="middle"
-                    fontSize="11"
+                    fontSize="10.5"
                     fontFamily="Space Grotesk, sans-serif"
                     fontWeight={isSelected || isHovered ? 600 : 400}
-                    fill={isSelected || isHovered ? "#FFFFFF" : "#94A3B8"}
-                    style={{ pointerEvents: "none", textShadow: "0 2px 4px rgba(0,0,0,0.9)" }}
+                    fill={isSelected ? "#FFFFFF" : isHovered ? "#E2E8F0" : "#94A3B8"}
+                    style={{ pointerEvents: "none", textShadow: "0 2px 8px rgba(0,0,0,0.95)" }}
                   >
                     {node.label}
                   </text>
+
+                  {/* Connections count for selected */}
+                  {isSelected && node.connections > 0 && (
+                    <text
+                      y={radius + 28}
+                      textAnchor="middle"
+                      fontSize="8"
+                      fontFamily="Space Mono, monospace"
+                      fill="#64748B"
+                      style={{ pointerEvents: "none" }}
+                    >
+                      {node.connections} connections
+                    </text>
+                  )}
                 </g>
               );
             })}
           </g>
         </svg>
 
-        <div className="pointer-events-none absolute bottom-3 left-4 flex items-center gap-3 text-[10px] text-txt-muted">
-          <span>{visibleNodes.length} nodes</span>
-          <span>·</span>
-          <span>drag to pan · use the buttons to zoom</span>
+        {/* Bottom status bar */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-between px-4 py-2.5">
+          <div className="flex items-center gap-3 font-mono text-[9px] text-[#64748B]">
+            <span>{visibleNodes.length} entities</span>
+            <span className="h-px w-4 bg-[#334155]/50" />
+            <span>{state.knowledge.edges.length} relationships</span>
+          </div>
+          <div className="flex items-center gap-3 font-mono text-[9px] text-[#64748B]">
+            {Object.entries(KIND_COLORS).slice(0, 5).map(([kind, colors]) => (
+              <span key={kind} className="flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: colors.stroke }} />
+                {kind}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
-    </Panel>
+    </div>
   );
 
+  /* --------------------------------------------------------------- Files */
   const filesPanel = (
-    <Panel className="p-5">
+    <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <SectionHeading label="Index" title={`${state.sources.length} known sources`} />
+        <div>
+          <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#00D1FF]">◆ FILE INDEX</div>
+          <h2 className="mt-1 font-display text-[20px] font-semibold text-[#E2E8F0]">
+            {state.sources.length} known sources
+          </h2>
+        </div>
         <Button
           size="sm"
           onClick={() => {
@@ -407,59 +510,78 @@ export default function KnowledgePage() {
         </Button>
       </div>
 
-      <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+      {/* Stats strip */}
+      <div className="flex items-center gap-6 border-b border-[#334155]/30 pb-4">
         {[
-          { label: "Indexed", value: indexStats.indexed, tone: "text-greenx" },
-          { label: "Queued", value: indexStats.queued, tone: "text-cyanx" },
-          { label: "Permission needed", value: indexStats.blocked, tone: "text-amberx" },
-          { label: "Inaccessible", value: indexStats.failed, tone: "text-warnx" },
+          { label: "INDEXED", value: indexStats.indexed, color: "#10B981" },
+          { label: "QUEUED", value: indexStats.queued, color: "#00D1FF" },
+          { label: "BLOCKED", value: indexStats.blocked, color: "#F59E0B" },
+          { label: "FAILED", value: indexStats.failed, color: "#EF4444" },
         ].map((stat) => (
-          <div key={stat.label} className="rounded-md border border-line-subtle bg-ink-850/40 p-3">
-            <div className={`numeral text-[18px] ${stat.tone}`}>{stat.value}</div>
-            <div className="mt-1 text-[10.5px] text-txt-muted">{stat.label}</div>
+          <div key={stat.label} className="flex items-baseline gap-2">
+            <span className="font-mono text-[22px] font-semibold leading-none" style={{ color: stat.color }}>
+              {stat.value}
+            </span>
+            <span className="font-mono text-[9px] uppercase tracking-wider text-[#64748B]">{stat.label}</span>
           </div>
         ))}
       </div>
 
-      <div className="mt-5 space-y-2.5">
+      {/* Source list */}
+      <div className="space-y-2">
         {state.sources.map((source) => (
-          <div key={source.id} className="rounded-md border border-line-subtle bg-ink-850/40 p-3.5">
-            <div className="flex items-start gap-3">
-              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xs border border-line-subtle bg-ink-800/70 text-cyanx">
-                {source.type === "image" ? <ImageIcon size={14} /> : <FileText size={14} />}
+          <div
+            key={source.id}
+            className="group rounded-xl border border-[#334155]/30 bg-[#0B1320]/40 p-4 backdrop-blur-sm transition-all duration-300 hover:border-[#334155]/60 hover:bg-[#0F1B2D]/50"
+          >
+            <div className="flex items-start gap-3.5">
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-[#334155]/40 bg-[#020407]/80">
+                {source.type === "image" ? (
+                  <ImageIcon size={14} className="text-[#10B981]" />
+                ) : (
+                  <FileText size={14} className="text-[#00D1FF]" />
+                )}
               </span>
               <div className="min-w-0 flex-1">
-                <div className="truncate text-[13px] font-medium text-txt-primary">{source.name}</div>
-                <div className="mt-0.5 truncate font-mono text-[10.5px] text-txt-muted">
+                <div className="truncate text-[13px] font-medium text-[#E2E8F0]">{source.name}</div>
+                <div className="mt-0.5 truncate font-mono text-[10px] text-[#64748B]">
                   {source.pathOrReference}
                 </div>
-                <div className="mt-2 flex flex-wrap items-center gap-2">
-                  <Chip as="span">{source.type}</Chip>
-                  <Chip as="span">{fileSize(source.sizeKb)}</Chip>
-                  <Chip
-                    as="span"
-                    active={source.indexStatus === "indexed"}
-                    className={source.indexStatus === "inaccessible" ? "border-warnx/40 text-warnx" : ""}
+                <div className="mt-2.5 flex flex-wrap items-center gap-2">
+                  <span className="rounded-full border border-[#334155]/40 bg-[#0A0F1C]/60 px-2 py-0.5 font-mono text-[10px] text-[#94A3B8]">
+                    {source.type}
+                  </span>
+                  <span className="rounded-full border border-[#334155]/40 bg-[#0A0F1C]/60 px-2 py-0.5 font-mono text-[10px] text-[#94A3B8]">
+                    {fileSize(source.sizeKb)}
+                  </span>
+                  <span
+                    className={`rounded-full border px-2 py-0.5 font-mono text-[10px] ${
+                      source.indexStatus === "indexed"
+                        ? "border-[#10B981]/30 bg-[#10B981]/10 text-[#10B981]"
+                        : source.indexStatus === "inaccessible" || source.indexStatus === "failed"
+                          ? "border-[#EF4444]/30 bg-[#EF4444]/10 text-[#EF4444]"
+                          : "border-[#334155]/40 bg-[#0A0F1C]/60 text-[#94A3B8]"
+                    }`}
                   >
                     {source.indexStatus === "indexing" ? "indexing…" : source.indexStatus}
-                  </Chip>
-                  {source.permissionStatus !== "granted" ? (
-                    <Chip as="span" className="border-amberx/40 text-amberx">
+                  </span>
+                  {source.permissionStatus !== "granted" && (
+                    <span className="rounded-full border border-[#F59E0B]/30 bg-[#F59E0B]/10 px-2 py-0.5 font-mono text-[10px] text-[#F59E0B]">
                       {source.permissionStatus}
-                    </Chip>
-                  ) : null}
-                  {source.indexedAt ? (
-                    <span className="text-[10.5px] text-txt-muted">
+                    </span>
+                  )}
+                  {source.indexedAt && (
+                    <span className="font-mono text-[10px] text-[#64748B]">
                       indexed {relativeTime(source.indexedAt, now)}
                     </span>
-                  ) : null}
+                  )}
                 </div>
-                {source.indexError ? (
+                {source.indexError && (
                   <div className="mt-2 flex items-start gap-2">
-                    <AlertTriangle size={12} className="mt-0.5 shrink-0 text-warnx" />
-                    <span className="text-[11px] text-warnx">{source.indexError}</span>
+                    <AlertTriangle size={11} className="mt-0.5 shrink-0 text-[#F59E0B]" />
+                    <span className="text-[11px] text-[#F59E0B]">{source.indexError}</span>
                   </div>
-                ) : null}
+                )}
               </div>
               <div className="flex shrink-0 flex-col gap-1.5">
                 {source.permissionStatus !== "granted" ? (
@@ -492,36 +614,49 @@ export default function KnowledgePage() {
         ))}
       </div>
 
-      <p className="mt-4 text-[10.5px] leading-relaxed text-txt-muted">
+      <p className="font-mono text-[10px] leading-relaxed text-[#64748B]">
         NeoBrain only reads folders you grant. Blocked folders stay inaccessible and are reported here
         rather than failing silently.
       </p>
-    </Panel>
+    </div>
   );
 
+  /* ----------------------------------------------------------------- Page */
   return (
     <div className="relative">
       {!isDesktop ? <MobileTopBar title="Knowledge" tagline="Search across everything." /> : null}
 
-      <div className={isDesktop ? "mx-auto max-w-[1240px] px-8 py-8" : "px-5 pb-8 pt-5"}>
+      <div className={isDesktop ? "mx-auto max-w-[1320px] px-8 py-8" : "px-5 pb-8 pt-5"}>
+        {/* Header */}
         {isDesktop ? (
-          <header className="mb-6 flex items-end justify-between gap-5">
-            <div>
-              <TechLabel tone="cyan">Knowledge</TechLabel>
-              <h1 className="mt-2 title-xl">See how everything connects.</h1>
-              <p className="mt-2 text-[13px] text-txt-secondary">
-                {state.knowledge.nodes.length} entities · {state.knowledge.edges.length} relationships ·
-                built from your own files and memories
-              </p>
+          <header className="mb-6">
+            <div className="flex items-end justify-between gap-5">
+              <div>
+                <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#00D1FF]">
+                  ◆ NEURAL TOPOLOGY
+                </div>
+                <h1 className="mt-2 font-display text-[38px] font-semibold leading-[1.05] text-[#E2E8F0]">
+                  See how everything connects.
+                </h1>
+              </div>
+              <Tabs
+                tabs={[
+                  { id: "graph", label: "Graph" },
+                  { id: "files", label: "Files", count: state.sources.length },
+                ]}
+                value={tab}
+                onChange={setTab}
+              />
             </div>
-            <Tabs
-              tabs={[
-                { id: "graph", label: "Graph" },
-                { id: "files", label: "Files", count: state.sources.length },
-              ]}
-              value={tab}
-              onChange={setTab}
-            />
+
+            {/* Inline stats */}
+            <div className="mt-4 flex items-center gap-6 font-mono text-[11px]">
+              <span className="text-[#00D1FF]">{state.knowledge.nodes.length} entities</span>
+              <span className="h-px w-4 bg-[#334155]/50" />
+              <span className="text-[#94A3B8]">{state.knowledge.edges.length} relationships</span>
+              <span className="h-px w-4 bg-[#334155]/50" />
+              <span className="text-[#64748B]">built from your files and memories</span>
+            </div>
           </header>
         ) : (
           <div className="mb-4">
@@ -537,8 +672,9 @@ export default function KnowledgePage() {
         )}
 
         {tab === "graph" ? (
-          <div className="grid gap-4 lg:grid-cols-[1.5fr_0.8fr]">
+          <div className="grid gap-5 lg:grid-cols-[1.6fr_0.7fr]">
             <div className="space-y-3">
+              {/* Project filter chips */}
               <div className="flex flex-wrap items-center gap-2">
                 <Chip active={projectFilter === "all"} onClick={() => setProjectFilter("all")}>
                   All projects
@@ -556,31 +692,40 @@ export default function KnowledgePage() {
               {graph}
             </div>
 
+            {/* Inspector sidebar */}
             <div className="space-y-4">
-              <Panel className="p-5">
-                <SectionHeading
-                  label="Selected"
-                  title={selectedNode?.label ?? "Nothing selected"}
-                />
+              {/* Selected node inspector */}
+              <div className="rounded-2xl border border-[#334155]/40 bg-[#0B1320]/50 p-5 backdrop-blur-xl shadow-[0_10px_30px_-10px_rgba(0,0,0,0.8)]">
+                <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-[#64748B]">
+                  ✦ SELECTED ENTITY
+                </div>
+                <h3 className="mt-2 font-display text-[18px] font-semibold text-[#E2E8F0]">
+                  {selectedNode?.label ?? "Nothing selected"}
+                </h3>
                 {selectedNode ? (
                   <>
                     <div className="mt-3 flex flex-wrap gap-2">
-                      <Chip as="span" active>
+                      <span className="rounded-full border border-[#00D1FF]/30 bg-[#00D1FF]/10 px-2.5 py-0.5 font-mono text-[10px] text-[#00D1FF]">
                         {selectedNode.kind}
-                      </Chip>
-                      <Chip as="span">{selectedNode.connections} links</Chip>
-                      {selectedNode.projectId ? (
-                        <Chip as="span">
+                      </span>
+                      <span className="rounded-full border border-[#334155]/40 bg-[#0A0F1C]/60 px-2.5 py-0.5 font-mono text-[10px] text-[#94A3B8]">
+                        {selectedNode.connections} links
+                      </span>
+                      {selectedNode.projectId && (
+                        <span className="rounded-full border border-[#334155]/40 bg-[#0A0F1C]/60 px-2.5 py-0.5 font-mono text-[10px] text-[#94A3B8]">
                           {state.projects.find((project) => project.id === selectedNode.projectId)?.name}
-                        </Chip>
-                      ) : null}
+                        </span>
+                      )}
                     </div>
 
-                    <div className="divider my-4" />
-                    <TechLabel className="mb-2.5">Connected to</TechLabel>
+                    <div className="my-4 h-px bg-gradient-to-r from-transparent via-[#334155]/50 to-transparent" />
+
+                    <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-[#64748B] mb-2.5">
+                      ✦ CONNECTIONS
+                    </div>
                     <div className="space-y-1">
                       {relatedEdges.length === 0 ? (
-                        <p className="text-[12px] text-txt-muted">No relationships recorded yet.</p>
+                        <p className="text-[12px] text-[#64748B]">No relationships recorded yet.</p>
                       ) : (
                         relatedEdges.map((edge) => {
                           const otherId = edge.from === selectedNode.id ? edge.to : edge.from;
@@ -601,17 +746,20 @@ export default function KnowledgePage() {
                     </div>
                   </>
                 ) : (
-                  <p className="mt-3 text-[12px] text-txt-muted">
+                  <p className="mt-3 text-[12px] leading-relaxed text-[#64748B]">
                     Tap a node in the graph to inspect its relationships, files and memories.
                   </p>
                 )}
-              </Panel>
+              </div>
 
-              <Panel className="p-5">
-                <SectionHeading label="Related" title={`Files · ${relatedFiles.length}`} />
-                <div className="mt-2.5 space-y-1">
+              {/* Related files & memories */}
+              <div className="rounded-2xl border border-[#334155]/40 bg-[#0B1320]/50 p-5 backdrop-blur-xl shadow-[0_10px_30px_-10px_rgba(0,0,0,0.8)]">
+                <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-[#64748B] mb-2.5">
+                  ✦ RELATED FILES · {relatedFiles.length}
+                </div>
+                <div className="space-y-1">
                   {relatedFiles.length === 0 ? (
-                    <p className="text-[12px] text-txt-muted">No files match this entity.</p>
+                    <p className="text-[12px] text-[#64748B]">No files match this entity.</p>
                   ) : (
                     relatedFiles.map((file) => (
                       <ListRow
@@ -624,11 +772,15 @@ export default function KnowledgePage() {
                     ))
                   )}
                 </div>
-                <div className="divider my-3.5" />
-                <SectionHeading label="Related" title={`Memories · ${relatedMemories.length}`} />
-                <div className="mt-2.5 space-y-1">
+
+                <div className="my-3.5 h-px bg-gradient-to-r from-transparent via-[#334155]/50 to-transparent" />
+
+                <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-[#64748B] mb-2.5">
+                  ✦ RELATED MEMORIES · {relatedMemories.length}
+                </div>
+                <div className="space-y-1">
                   {relatedMemories.length === 0 ? (
-                    <p className="text-[12px] text-txt-muted">No memories mention this entity.</p>
+                    <p className="text-[12px] text-[#64748B]">No memories mention this entity.</p>
                   ) : (
                     relatedMemories.slice(0, 5).map((memory) => (
                       <ListRow
@@ -642,17 +794,16 @@ export default function KnowledgePage() {
                     ))
                   )}
                 </div>
-              </Panel>
+              </div>
 
-              <Panel className="p-5">
-                <div className="flex items-start gap-3">
-                  <Sparkles size={15} className="mt-0.5 shrink-0 text-cyanx" />
-                  <p className="text-[11.5px] leading-relaxed text-txt-secondary">
-                    Links are derived from your own memories, file names and metadata using local
-                    matching. No external service builds this graph.
-                  </p>
-                </div>
-              </Panel>
+              {/* Attribution */}
+              <div className="flex items-start gap-3 rounded-xl border border-[#334155]/25 bg-[#0B1320]/30 p-4">
+                <Sparkles size={14} className="mt-0.5 shrink-0 text-[#00D1FF]" />
+                <p className="text-[11px] leading-relaxed text-[#64748B]">
+                  Links are derived from your own memories, file names and metadata using local
+                  matching. No external service builds this graph.
+                </p>
+              </div>
             </div>
           </div>
         ) : (
