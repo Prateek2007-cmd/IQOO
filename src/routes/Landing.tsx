@@ -299,17 +299,16 @@ function Hero() {
           }}
         />
 
-        {/* Tapered upward light shaft from circular floor platform */}
+        {/* Soft volumetric light shaft connecting floor platform with the Core */}
         <div
-          className="absolute left-1/2 -translate-x-1/2"
+          className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
           style={{
-            width: "clamp(240px, 28vw, 400px)",
-            height: "clamp(170px, 24vh, 290px)",
-            bottom: "clamp(13%, 19vh, 25%)",
+            width: "clamp(320px, 38vw, 500px)",
+            height: "clamp(200px, 28vh, 320px)",
+            bottom: "clamp(12%, 18vh, 24%)",
             background:
-              "linear-gradient(180deg, transparent 0%, rgba(0, 210, 255, 0.04) 40%, rgba(0, 235, 255, 0.18) 100%)",
-            clipPath: "polygon(22% 0%, 78% 0%, 100% 100%, 0% 100%)",
-            filter: "blur(14px)",
+              "radial-gradient(ellipse 60% 85% at 50% 100%, rgba(0, 220, 255, 0.18) 0%, rgba(0, 150, 255, 0.06) 55%, transparent 80%)",
+            filter: "blur(28px)",
           }}
         />
 
