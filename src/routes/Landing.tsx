@@ -30,9 +30,11 @@ import {
   Wand2,
   X,
 } from "lucide-react";
-import { useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { BrainCore } from "../components/BrainCore";
+import NeoBrainCore from "./NeoBrainCore";
+import observatoryBg from "../neobrain-observatory.png";
 import {
   AnswerPreview,
   GraphPreview,
@@ -47,6 +49,8 @@ import { Button, Reveal, StatusDot, TechLabel } from "../components/ui";
 
 /* --------------------------------------------------------------------- nav */
 
+/* --------------------------------------------------------------------- nav */
+
 function SiteNav() {
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
@@ -54,46 +58,138 @@ function SiteNav() {
   useMotionValueEvent(scrollY, "change", (value) => setScrolled(value > 24));
 
   const links = [
-    { href: "#product", label: "Product" },
+    { href: "#home", label: "Home" },
     { href: "#features", label: "Features" },
+    { href: "#how-it-works", label: "How It Works" },
     { href: "#privacy", label: "Privacy" },
-    { href: "#devices", label: "Devices" },
+    { href: "#developers", label: "For Developers" },
   ];
 
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
-        scrolled ? "border-b border-line-subtle bg-ink-900/78 backdrop-blur-xl" : "border-b border-transparent"
+        scrolled
+          ? "border-b border-white/[0.06] bg-[#02050a]/80 backdrop-blur-xl py-3"
+          : "border-b border-white/[0.03] bg-[#02050a]/20 backdrop-blur-md py-4 sm:py-4.5"
       }`}
     >
-      <nav className="mx-auto flex max-w-[1240px] items-center justify-between gap-6 px-6 py-4" aria-label="Main">
-        <NeoBrainWordmark as="link" size={12} />
-        <div className="hidden items-center gap-8 md:flex">
+      <nav className="mx-auto flex max-w-[1280px] items-center justify-between gap-6 px-6 sm:px-8" aria-label="Main">
+        {/* Left: Brand */}
+        <a href="#home" className="group flex items-center gap-2.5">
+          <span className="text-cyan-400 transition-transform duration-300 group-hover:scale-105 inline-flex items-center">
+            <NeoBrainMark size={18} />
+          </span>
+          <span className="font-display text-[14.5px] font-bold tracking-[0.18em] text-white">
+            NEOBRAIN
+          </span>
+        </a>
+
+        {/* Center: Links */}
+        <div className="hidden items-center gap-7 lg:gap-8 md:flex">
           {links.map((link) => (
             <a
-              key={link.href}
+              key={link.label}
               href={link.href}
-              className="text-[12.5px] font-medium text-txt-secondary transition-colors hover:text-txt-primary"
+              className="text-[11.5px] font-medium tracking-[0.14em] text-neutral-400 uppercase transition-colors duration-200 hover:text-white"
             >
               {link.label}
             </a>
           ))}
         </div>
-        <div className="flex items-center gap-2">
-          <Link to="/auth?returnTo=%2Fapp" className="btn btn-ghost h-9 px-3.5 text-[12.5px]">
-            Sign in
-          </Link>
-          <Button
-            variant="primary"
-            size="sm"
+
+        {/* Right: CTA */}
+        <div className="flex items-center gap-3">
+          <button
             onClick={() => navigate("/auth?returnTo=%2Fapp%2Fboot")}
-            className="hidden sm:inline-flex"
+            className="group relative inline-flex items-center gap-1.5 overflow-hidden rounded-full border border-cyan-400/25 bg-cyan-950/25 px-4 py-1.5 text-[12px] font-medium tracking-[0.05em] text-cyan-200 backdrop-blur-md transition-all duration-300 hover:border-cyan-400/55 hover:bg-cyan-500/15 hover:text-white hover:shadow-[0_0_20px_rgba(0,217,255,0.25)] active:scale-95"
           >
-            Get Started
-          </Button>
+            <span>Get Early Access</span>
+            <span className="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
+          </button>
         </div>
       </nav>
     </header>
+  );
+}
+
+/* -------------------------------------------------------------------- atmospheric particles */
+
+function AtmosphericParticles() {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let animId: number;
+    let width = (canvas.width = canvas.offsetWidth);
+    let height = (canvas.height = canvas.offsetHeight);
+
+    const onResize = () => {
+      if (!canvas) return;
+      width = canvas.width = canvas.offsetWidth;
+      height = canvas.height = canvas.offsetHeight;
+    };
+    window.addEventListener("resize", onResize);
+
+    // Micro-particles drifting slowly in the central observatory air column
+    const count = 36;
+    const particles = Array.from({ length: count }, () => ({
+      x: width * 0.5 + (Math.random() - 0.5) * width * 0.55,
+      y: Math.random() * height,
+      size: Math.random() * 1.5 + 0.6,
+      speedY: Math.random() * 0.22 + 0.08,
+      speedX: (Math.random() - 0.5) * 0.1,
+      opacity: Math.random() * 0.32 + 0.08,
+      phase: Math.random() * Math.PI * 2,
+      isWarm: Math.random() > 0.72,
+    }));
+
+    let t = 0;
+    const render = () => {
+      t += 0.015;
+      ctx.clearRect(0, 0, width, height);
+
+      for (const p of particles) {
+        p.y -= p.speedY;
+        p.x += Math.sin(t + p.phase) * 0.22 + p.speedX;
+
+        if (p.y < 0) {
+          p.y = height + 8;
+          p.x = width * 0.5 + (Math.random() - 0.5) * width * 0.55;
+        }
+
+        const alpha = p.opacity * (0.75 + 0.25 * Math.sin(t * 1.3 + p.phase));
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+
+        if (p.isWarm) {
+          ctx.fillStyle = `rgba(255, 235, 210, ${alpha})`;
+        } else {
+          ctx.fillStyle = `rgba(90, 220, 255, ${alpha})`;
+        }
+        ctx.fill();
+      }
+
+      animId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      window.removeEventListener("resize", onResize);
+      cancelAnimationFrame(animId);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="pointer-events-none absolute inset-0 h-full w-full opacity-65"
+      aria-hidden="true"
+    />
   );
 }
 
@@ -101,131 +197,246 @@ function SiteNav() {
 
 function Hero() {
   const navigate = useNavigate();
-  const ref = useRef<HTMLDivElement | null>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const coreY = useTransform(scrollYProgress, [0, 1], [0, 90]);
-  const deviceY = useTransform(scrollYProgress, [0, 1], [0, -50]);
-  const stageScale = useTransform(scrollYProgress, [0, 1], [1, 0.94]);
-  const copyOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
+  const heroRef = useRef<HTMLDivElement | null>(null);
+  const [coreState, setCoreState] = useState<"idle" | "listening" | "thinking" | "responding">("idle");
+  const [isHovered, setIsHovered] = useState(false);
+
+  // Scroll animations for seamless gradual transition into the next section
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+
+  // Parallax & depth transforms
+  const bgScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
+  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "14%"]);
+  const bgDarken = useTransform(scrollYProgress, [0, 0.9], [0, 0.76]);
+  const coreY = useTransform(scrollYProgress, [0, 1], ["0px", "-130px"]);
+  const coreScale = useTransform(scrollYProgress, [0, 1], [1, 0.92]);
+  const coreOpacity = useTransform(scrollYProgress, [0, 0.85], [1, 0]);
+  const topTextFade = useTransform(scrollYProgress, [0, 0.42], [1, 0]);
+  const topTextY = useTransform(scrollYProgress, [0, 0.42], ["0px", "-35px"]);
+  const bottomTextFade = useTransform(scrollYProgress, [0, 0.52], [1, 0]);
+  const bottomTextY = useTransform(scrollYProgress, [0, 0.52], ["0px", "35px"]);
+
+  const handleCoreEngage = () => {
+    // Interactively cycle states on click
+    setCoreState((prev) => {
+      if (prev === "idle") return "listening";
+      if (prev === "listening") return "thinking";
+      if (prev === "thinking") return "responding";
+      return "idle";
+    });
+  };
 
   return (
-    <section ref={ref} className="relative overflow-hidden pb-16 pt-32 sm:pt-40" id="product">
-      <div className="mx-auto grid max-w-[1240px] items-center gap-14 px-6 lg:grid-cols-[0.95fr_1.05fr]">
-        <motion.div style={{ opacity: copyOpacity }}>
-          <div className="inline-flex items-center gap-2.5 rounded-full border border-line-soft bg-ink-850/60 px-3 py-1.5">
-            <StatusDot tone="cyan" pulse />
-            <span className="text-[10.5px] font-medium uppercase tracking-label text-txt-secondary">
-              Privacy-first · Local by default
+    <section
+      ref={heroRef}
+      id="home"
+      className="relative h-screen min-h-[680px] w-full overflow-hidden select-none bg-[#020408]"
+    >
+      {/* =========================================================================
+          LAYER 1: Cinematic background image
+          - Covers entire hero viewport (100vw × 100vh)
+          - object-fit: cover, object-position: center
+          - Preserves cinematic composition with slow parallax on scroll
+          ========================================================================= */}
+      <motion.div
+        style={{ scale: bgScale, y: bgY }}
+        className="pointer-events-none absolute inset-0 z-0 h-full w-full overflow-hidden will-change-transform"
+      >
+        <img
+          src={observatoryBg}
+          alt="NeoBrain Futuristic Observatory Stage"
+          className="h-full w-full object-cover object-center select-none"
+        />
+      </motion.div>
+
+      {/* =========================================================================
+          LAYER 2: Very subtle dark blue/black gradient overlay
+          - Atmospheric aerospace laboratory tone
+          - Scroll darkening to seamlessly introduce next section
+          ========================================================================= */}
+      {/* Scroll-driven darkening layer */}
+      <motion.div
+        style={{ opacity: bgDarken }}
+        className="pointer-events-none absolute inset-0 z-[1] bg-[#020408]"
+      />
+      {/* Top & bottom gentle darkening vignette */}
+      <div className="pointer-events-none absolute inset-0 z-[2] bg-gradient-to-b from-[#02050b]/70 via-transparent to-[#020408]/90" />
+      {/* Radial depth vignette */}
+      <div
+        className="pointer-events-none absolute inset-0 z-[2]"
+        style={{
+          background:
+            "radial-gradient(ellipse 85% 70% at 50% 50%, transparent 35%, rgba(2, 5, 11, 0.55) 100%)",
+        }}
+      />
+      {/* Seamless bottom transition gradient */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-40 bg-gradient-to-t from-[#020408] via-[#020408]/75 to-transparent" />
+
+      {/* =========================================================================
+          LAYER 3: Very subtle atmospheric particles and light effects
+          - Upward cyan platform illumination
+          - Volumetric skylight downbeam
+          - Ambient presence halo around the Core
+          ========================================================================= */}
+      <div className="pointer-events-none absolute inset-0 z-[3] overflow-hidden">
+        {/* Floating atmospheric micro-particles */}
+        <AtmosphericParticles />
+
+        {/* Upward cyan illumination from circular platform base onto lower Core */}
+        <div
+          className="absolute left-1/2 -translate-x-1/2 transition-opacity duration-700"
+          style={{
+            width: "clamp(320px, 42vw, 580px)",
+            height: "clamp(130px, 18vh, 220px)",
+            bottom: "clamp(12%, 18vh, 24%)",
+            background:
+              "radial-gradient(ellipse 65% 55% at 50% 90%, rgba(0, 225, 255, 0.28) 0%, rgba(0, 160, 255, 0.09) 45%, transparent 75%)",
+            filter: "blur(22px)",
+            opacity: isHovered ? 0.95 : 0.75,
+          }}
+        />
+
+        {/* Tapered upward light shaft from circular floor platform */}
+        <div
+          className="absolute left-1/2 -translate-x-1/2"
+          style={{
+            width: "clamp(240px, 28vw, 400px)",
+            height: "clamp(170px, 24vh, 290px)",
+            bottom: "clamp(13%, 19vh, 25%)",
+            background:
+              "linear-gradient(180deg, transparent 0%, rgba(0, 210, 255, 0.04) 40%, rgba(0, 235, 255, 0.18) 100%)",
+            clipPath: "polygon(22% 0%, 78% 0%, 100% 100%, 0% 100%)",
+            filter: "blur(14px)",
+          }}
+        />
+
+        {/* Atmospheric presence glow centered around the Core */}
+        <div
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-700"
+          style={{
+            width: "clamp(420px, 50vw, 680px)",
+            height: "clamp(420px, 50vw, 680px)",
+            background:
+              "radial-gradient(circle at 50% 50%, rgba(0, 215, 255, 0.09) 0%, rgba(15, 60, 110, 0.035) 45%, transparent 70%)",
+            filter: "blur(30px)",
+            opacity: isHovered ? 1 : 0.8,
+          }}
+        />
+
+        {/* Skylight downlight from observatory dome aperture */}
+        <div
+          className="absolute top-0 left-1/2 -translate-x-1/2"
+          style={{
+            width: "clamp(280px, 34vw, 480px)",
+            height: "40vh",
+            background:
+              "radial-gradient(ellipse 55% 100% at 50% 0%, rgba(215, 245, 255, 0.12) 0%, rgba(140, 210, 255, 0.03) 60%, transparent 90%)",
+            filter: "blur(26px)",
+          }}
+        />
+      </div>
+
+      {/* =========================================================================
+          LAYER 4: The real interactive NeoBrainCore
+          - Physically integrated into the empty circular platform
+          - Floating slightly above the platform in 3D perspective
+          - Desktop: 380–500px, Large desktop: 450–560px
+          - Reacts to mouse movement, hover increases activity, click interacts
+          ========================================================================= */}
+      <motion.div
+        style={{ y: coreY, scale: coreScale, opacity: coreOpacity }}
+        className="pointer-events-none absolute inset-0 z-[10] flex items-center justify-center will-change-transform"
+      >
+        <div
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          className="pointer-events-auto relative group cursor-pointer transition-transform duration-500 hover:scale-[1.025]"
+          style={{
+            width: "clamp(340px, 42vw, 540px)",
+            height: "clamp(340px, 42vw, 540px)",
+            maxWidth: "540px",
+            maxHeight: "540px",
+          }}
+        >
+          <NeoBrainCore
+            state={coreState}
+            quality="high"
+            amplitude={isHovered ? 0.3 : 0}
+            onEngage={handleCoreEngage}
+            style={{
+              background: "transparent",
+              borderRadius: 0,
+              width: "100%",
+              height: "100%",
+            }}
+          />
+        </div>
+      </motion.div>
+
+      {/* =========================================================================
+          LAYER 5: Navigation and Typography
+          - Placed above and around the Core
+          - Core remains the undisputed visual focal point
+          ========================================================================= */}
+      <div className="pointer-events-none relative z-[20] mx-auto flex h-full w-full max-w-[1280px] flex-col justify-between px-6 pb-12 pt-24 sm:pt-28 md:pt-32">
+        {/* UPPER TYPOGRAPHY (Above Core) */}
+        <motion.div
+          style={{ opacity: topTextFade, y: topTextY }}
+          className="mx-auto flex flex-col items-center text-center will-change-transform"
+        >
+          {/* Eyebrow */}
+          <div className="inline-flex items-center gap-2 mb-2.5 sm:mb-3">
+            <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(0,229,255,0.9)] animate-pulse" />
+            <span className="text-[10.5px] sm:text-[11.5px] font-semibold tracking-[0.28em] text-cyan-300 uppercase">
+              YOUR SECOND BRAIN
             </span>
           </div>
 
-          <h1 className="mt-7 font-display text-[42px] font-semibold leading-[0.98] tracking-[-0.02em] sm:text-[62px] lg:text-[68px]">
-            <span className="block text-txt-primary">YOUR SECOND</span>
-            <span className="block text-txt-primary">BRAIN.</span>
-            <span className="mt-1 block text-signal">ALWAYS WITH YOU.</span>
+          {/* Main Heading */}
+          <h1 className="font-display text-[46px] sm:text-[68px] md:text-[82px] lg:text-[94px] font-bold tracking-[-0.025em] leading-none text-transparent bg-clip-text bg-gradient-to-b from-white via-white/95 to-white/70 drop-shadow-[0_4px_30px_rgba(0,180,255,0.18)]">
+            NEOBRAIN
           </h1>
-
-          <p className="mt-6 max-w-[52ch] text-[15px] leading-relaxed text-txt-secondary">
-            NeoBrain is a private memory system that lives across your phone and laptop. It remembers
-            your conversations, files and decisions, then answers questions about your own work — on
-            your device.
-          </p>
-
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Button variant="primary" className="h-12 px-5 text-[14px]" onClick={() => navigate("/auth?returnTo=%2Fapp%2Fboot")}>
-              Get Started
-              <ArrowRight size={17} />
-            </Button>
-            <Button className="h-12 px-5 text-[14px]" icon={PlayCircle} onClick={() => navigate("/auth?returnTo=%2Fapp%2Fvoice")}>
-              Watch demo
-            </Button>
-          </div>
-
-          <div className="mt-9 flex flex-wrap items-center gap-x-5 gap-y-2.5">
-            {["LOCAL", "PRIVATE", "CONTEXTUAL", "ALWAYS YOURS"].map((principle) => (
-              <span key={principle} className="flex items-center gap-2 text-[10px] uppercase tracking-label text-txt-muted">
-                <span className="h-px w-4 bg-gradient-to-r from-cyanx/70 to-transparent" />
-                {principle}
-              </span>
-            ))}
-          </div>
         </motion.div>
 
-        {/* cinematic device composition */}
-        <motion.div style={{ y: deviceY, scale: stageScale }} className="relative">
-          <motion.div style={{ y: coreY }} className="pointer-events-none absolute inset-0 grid place-items-center">
-            <BrainCore state="ready" size={560} interactive={false} className="opacity-[0.85]" />
-          </motion.div>
-
-          {/* orbital rings */}
-          <svg
-            viewBox="0 0 600 600"
-            className="pointer-events-none absolute inset-0 h-full w-full"
-            aria-hidden="true"
-          >
-            <defs>
-              <linearGradient id="ring-a" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="rgba(0,217,255,0)" />
-                <stop offset="50%" stopColor="rgba(0,217,255,0.5)" />
-                <stop offset="100%" stopColor="rgba(141,108,255,0)" />
-              </linearGradient>
-            </defs>
-            <ellipse cx="300" cy="300" rx="272" ry="88" fill="none" stroke="url(#ring-a)" strokeWidth="1" opacity="0.7" />
-            <ellipse
-              cx="300"
-              cy="300"
-              rx="212"
-              ry="286"
-              fill="none"
-              stroke="rgba(141,108,255,0.22)"
-              strokeWidth="0.8"
-              transform="rotate(22 300 300)"
-            />
-          </svg>
-
-          <div className="relative mx-auto w-full max-w-[560px]">
-            <LaptopFrame className="relative z-10 mx-auto w-[92%] translate-y-6">
-              <WorkspacePreview />
-            </LaptopFrame>
-            <PhoneFrame className="relative z-20 mx-auto -mt-[38%] w-[42%] max-w-[190px]">
-              <VoicePreview label="Listening…" />
-            </PhoneFrame>
+        {/* LOWER TYPOGRAPHY & CTAs (Below Core / Around Platform) */}
+        <motion.div
+          style={{ opacity: bottomTextFade, y: bottomTextY }}
+          className="mx-auto flex flex-col items-center text-center will-change-transform"
+        >
+          {/* Supporting Line */}
+          <div className="text-[13px] sm:text-[15px] md:text-[16px] font-medium tracking-[0.24em] uppercase text-cyan-200 drop-shadow-[0_2px_12px_rgba(0,217,255,0.25)]">
+            Perceive. Remember. Connect.
           </div>
 
-          {/* technical callouts */}
-          <div className="pointer-events-none absolute left-0 top-[18%] hidden xl:block">
-            <div className="glass-quiet rounded-md px-3 py-2.5">
-              <TechLabel tone="cyan">Pocket Brain</TechLabel>
-              <div className="mt-1 text-[12.5px] font-medium text-txt-primary">iQOO 15</div>
-              <div className="text-[11px] text-txt-muted">On device</div>
-            </div>
-            <div className="ml-6 mt-3 h-14 w-px bg-gradient-to-b from-cyanx/50 to-transparent" />
-          </div>
+          {/* Secondary Text */}
+          <p className="mt-2 text-[13.5px] sm:text-[15px] leading-relaxed text-neutral-300 max-w-[48ch] drop-shadow-[0_1px_8px_rgba(0,0,0,0.8)]">
+            An intelligent memory layer for everything you do.
+          </p>
 
-          <div className="pointer-events-none absolute bottom-[16%] right-0 hidden xl:block">
-            <div className="h-14 w-px bg-gradient-to-b from-transparent to-violetx/50" />
-            <div className="glass-quiet ml-[-42px] mt-3 rounded-md px-3 py-2.5">
-              <TechLabel tone="violet">Deep Brain</TechLabel>
-              <div className="mt-1 text-[12.5px] font-medium text-txt-primary">Laptop</div>
-              <div className="text-[11px] text-txt-muted">Higher intelligence</div>
-            </div>
+          {/* Action CTAs */}
+          <div className="pointer-events-auto mt-6 flex flex-wrap items-center justify-center gap-3.5 sm:gap-4">
+            <button
+              onClick={() => navigate("/auth?returnTo=%2Fapp%2Fboot")}
+              className="group relative inline-flex items-center gap-2 rounded-full border border-cyan-400/40 bg-cyan-500/20 px-6 py-3 text-[13.5px] font-medium tracking-[0.04em] text-white shadow-[0_0_28px_rgba(0,217,255,0.3)] backdrop-blur-md transition-all duration-300 hover:border-cyan-400 hover:bg-cyan-500/30 hover:shadow-[0_0_36px_rgba(0,217,255,0.45)] active:scale-95"
+            >
+              <span>Explore NeoBrain</span>
+              <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+            </button>
+
+            <button
+              onClick={() => navigate("/auth?returnTo=%2Fapp%2Fvoice")}
+              className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-5 py-3 text-[13.5px] font-medium tracking-[0.04em] text-neutral-300 backdrop-blur-md transition-all duration-300 hover:border-white/20 hover:bg-white/[0.08] hover:text-white active:scale-95"
+            >
+              <PlayCircle size={15} className="text-cyan-400 transition-transform duration-300 group-hover:scale-110" />
+              <span>Watch the experience</span>
+              <span className="transition-transform duration-200 group-hover:translate-x-0.5 text-neutral-400">→</span>
+            </button>
           </div>
         </motion.div>
       </div>
-
-      <Reveal delay={0.15} className="mx-auto mt-20 max-w-[1240px] px-6">
-        <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-[10px] uppercase tracking-label text-txt-muted">
-          <span>Perceive</span>
-          <span className="text-line-strong">·</span>
-          <span>Remember</span>
-          <span className="text-line-strong">·</span>
-          <span>Connect</span>
-          <span className="text-line-strong">·</span>
-          <span>Assist</span>
-          <span className="text-line-strong">·</span>
-          <span>Evolve</span>
-        </div>
-      </Reveal>
     </section>
   );
 }
