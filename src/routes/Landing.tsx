@@ -296,12 +296,12 @@ function Hero() {
         <div
           className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
           style={{
-            width: "clamp(340px, 38vw, 580px)",
-            height: "clamp(48px, 7.5vh, 90px)",
-            bottom: "clamp(55px, 8vh, 95px)",
+            width: "clamp(260px, 30vw, 440px)",
+            height: "clamp(36px, 5vh, 65px)",
+            bottom: "clamp(65px, 9vh, 110px)",
             background:
-              "radial-gradient(ellipse 65% 55% at 50% 50%, rgba(1, 4, 10, 0.72) 0%, rgba(1, 4, 10, 0.25) 55%, transparent 80%)",
-            filter: "blur(16px)",
+              "radial-gradient(ellipse 65% 55% at 50% 50%, rgba(1, 4, 10, 0.55) 0%, rgba(1, 4, 10, 0.2) 55%, transparent 80%)",
+            filter: "blur(14px)",
           }}
         />
 
@@ -309,12 +309,12 @@ function Hero() {
         <div
           className="absolute left-1/2 -translate-x-1/2 transition-opacity duration-700 pointer-events-none"
           style={{
-            width: "clamp(480px, 54vw, 880px)",
-            height: "clamp(95px, 13vh, 165px)",
-            bottom: "clamp(50px, 7.5vh, 90px)",
+            width: "clamp(380px, 44vw, 640px)",
+            height: "clamp(65px, 8.5vh, 110px)",
+            bottom: "clamp(60px, 8.5vh, 105px)",
             background:
-              "radial-gradient(ellipse 70% 48% at 50% 50%, rgba(0, 225, 255, 0.24) 0%, rgba(0, 160, 245, 0.07) 50%, transparent 80%)",
-            filter: "blur(24px)",
+              "radial-gradient(ellipse 70% 48% at 50% 50%, rgba(0, 220, 255, 0.14) 0%, rgba(0, 160, 245, 0.045) 50%, transparent 80%)",
+            filter: "blur(22px)",
             opacity: isHovered ? 0.95 : 0.75,
           }}
         />
@@ -323,12 +323,12 @@ function Hero() {
         <div
           className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
           style={{
-            width: "clamp(390px, 46vw, 660px)",
-            height: "clamp(250px, 32vh, 400px)",
-            bottom: "clamp(60px, 8.5vh, 105px)",
+            width: "clamp(300px, 34vw, 500px)",
+            height: "clamp(190px, 24vh, 290px)",
+            bottom: "clamp(70px, 9.5vh, 115px)",
             background:
-              "radial-gradient(ellipse 55% 85% at 50% 100%, rgba(0, 215, 255, 0.14) 0%, rgba(0, 140, 240, 0.04) 60%, transparent 85%)",
-            filter: "blur(32px)",
+              "radial-gradient(ellipse 55% 85% at 50% 100%, rgba(0, 210, 255, 0.08) 0%, rgba(0, 140, 240, 0.025) 60%, transparent 85%)",
+            filter: "blur(28px)",
           }}
         />
 
@@ -336,12 +336,12 @@ function Hero() {
         <div
           className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-700 pointer-events-none"
           style={{
-            top: "55%",
-            width: "clamp(720px, 68vw, 1140px)",
-            height: "clamp(720px, 68vw, 1140px)",
+            top: "58%",
+            width: "clamp(540px, 52vw, 820px)",
+            height: "clamp(540px, 52vw, 820px)",
             background:
-              "radial-gradient(circle at 50% 50%, rgba(0, 210, 255, 0.09) 0%, rgba(0, 140, 230, 0.03) 45%, transparent 70%)",
-            filter: "blur(56px)",
+              "radial-gradient(circle at 50% 50%, rgba(0, 210, 255, 0.065) 0%, rgba(0, 140, 230, 0.02) 45%, transparent 70%)",
+            filter: "blur(48px)",
             opacity: isHovered ? 1 : 0.8,
           }}
         />
@@ -350,10 +350,10 @@ function Hero() {
         <div
           className="absolute top-0 left-1/2 -translate-x-1/2 pointer-events-none"
           style={{
-            width: "clamp(300px, 36vw, 520px)",
+            width: "clamp(280px, 34vw, 480px)",
             height: "36vh",
             background:
-              "radial-gradient(ellipse 55% 100% at 50% 0%, rgba(215, 245, 255, 0.11) 0%, rgba(140, 210, 255, 0.025) 60%, transparent 90%)",
+              "radial-gradient(ellipse 55% 100% at 50% 0%, rgba(215, 245, 255, 0.1) 0%, rgba(140, 210, 255, 0.02) 60%, transparent 90%)",
             filter: "blur(26px)",
           }}
         />
@@ -361,9 +361,8 @@ function Hero() {
 
       {/* =========================================================================
           LAYER 4: The real interactive NeoBrainCore
-          - Enlarged to a dominant, commanding visual presence
-          - Full 360° interactive drag rotation & physical responsiveness
-          - Floats naturally above the central circular floor platform
+          - Scaled to 420-460px desktop visual diameter
+          - Floats suspended ~80-120px above the central circular floor platform
           - Horizontally centered, responsive, uninhibited 3D interactivity
           ========================================================================= */}
       <motion.div
@@ -373,11 +372,11 @@ function Hero() {
         <div
           style={{
             position: "absolute",
-            top: "55%",
+            top: "58%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: "clamp(1040px, 96vw, 1600px)",
-            height: "clamp(1040px, 96vw, 1600px)",
+            width: "clamp(720px, 73vw, 1060px)",
+            height: "clamp(720px, 73vw, 1060px)",
           }}
           className="flex items-center justify-center pointer-events-none"
         >
@@ -436,8 +435,8 @@ function Hero() {
         <span className="text-[9px] font-medium tracking-[0.26em] text-neutral-400 uppercase font-mono">A BRIGHTER YOU</span>
       </div>
 
-      {/* UPPER-MID TYPOGRAPHY BLOCK */}
-      <div className="pointer-events-none relative z-[20] mx-auto flex h-full w-full max-w-[1360px] flex-col items-center justify-start px-6 pt-16 sm:pt-20 md:pt-22">
+      {/* UPPER-MID TYPOGRAPHY & CTA BLOCK: Above the Core with clear breathing room */}
+      <div className="pointer-events-none relative z-[20] mx-auto flex h-full w-full max-w-[1360px] flex-col items-center justify-start px-6 pt-[72px] sm:pt-20 md:pt-22">
         <motion.div
           style={{ opacity: topTextFade, y: topTextY }}
           className="mx-auto flex flex-col items-center text-center will-change-transform"
@@ -448,7 +447,7 @@ function Hero() {
           </div>
 
           {/* Main Heading */}
-          <h1 className="font-display text-[38px] sm:text-[52px] md:text-[66px] lg:text-[78px] font-bold tracking-[0.14em] sm:tracking-[0.16em] leading-none select-none">
+          <h1 className="font-display text-[38px] sm:text-[52px] md:text-[66px] lg:text-[76px] font-bold tracking-[0.14em] sm:tracking-[0.16em] leading-none select-none">
             <span className="text-white drop-shadow-[0_4px_24px_rgba(255,255,255,0.25)]">NEO</span>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-[#38bdf8] to-cyan-300 drop-shadow-[0_0_36px_rgba(0,217,255,0.65)]">
               BRAIN
@@ -464,30 +463,28 @@ function Hero() {
           <p className="mt-0.5 sm:mt-1 text-[11.5px] sm:text-[12.5px] text-neutral-400/90 font-normal max-w-[46ch]">
             An intelligent memory layer for everything you do.
           </p>
+
+          {/* Action CTAs: Positioned cleanly ABOVE the Core */}
+          <div className="pointer-events-auto mt-4 sm:mt-5 flex items-center justify-center gap-3 sm:gap-4">
+            <button
+              onClick={() => navigate("/auth?returnTo=%2Fapp%2Fboot")}
+              className="group rounded-full border border-white/20 bg-black/50 px-5 sm:px-6 py-2 sm:py-2.5 text-[12.5px] sm:text-[13px] font-medium tracking-wide text-white backdrop-blur-md transition-all duration-300 hover:border-cyan-400/80 hover:bg-cyan-950/30 hover:shadow-[0_0_24px_rgba(0,217,255,0.35)] active:scale-95"
+            >
+              <span>Explore NeoBrain</span>
+              <span className="ml-1.5 transition-transform duration-200 group-hover:translate-x-1 inline-block">→</span>
+            </button>
+
+            <button
+              onClick={() => navigate("/auth?returnTo=%2Fapp%2Fvoice")}
+              className="group rounded-full border border-white/10 hover:border-white/25 bg-black/30 px-3.5 sm:px-4 py-2 sm:py-2.5 text-[12.5px] sm:text-[13px] font-medium tracking-wide text-neutral-300 hover:text-white backdrop-blur-sm transition-all duration-300 flex items-center gap-2 active:scale-95"
+            >
+              <span className="flex items-center justify-center w-5 sm:w-5.5 h-5 sm:h-5.5 rounded-full border border-cyan-400/60 bg-cyan-950/40 text-cyan-300 text-[9px] sm:text-[10px] pl-0.5 shadow-[0_0_10px_rgba(0,217,255,0.3)] transition-transform duration-300 group-hover:scale-110">
+                ▶
+              </span>
+              <span>Watch Video</span>
+            </button>
+          </div>
         </motion.div>
-      </div>
-
-      {/* BOTTOM ACTION CTAs: Clean vertical separation beneath the Core */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-6 sm:bottom-7 lg:bottom-8 z-[30] flex items-center justify-center px-6">
-        <div className="pointer-events-auto flex items-center justify-center gap-3 sm:gap-4">
-          <button
-            onClick={() => navigate("/auth?returnTo=%2Fapp%2Fboot")}
-            className="group rounded-full border border-white/20 bg-black/50 px-5 sm:px-6 py-2 sm:py-2.5 text-[12.5px] sm:text-[13px] font-medium tracking-wide text-white backdrop-blur-md transition-all duration-300 hover:border-cyan-400/80 hover:bg-cyan-950/30 hover:shadow-[0_0_24px_rgba(0,217,255,0.35)] active:scale-95"
-          >
-            <span>Explore NeoBrain</span>
-            <span className="ml-1.5 transition-transform duration-200 group-hover:translate-x-1 inline-block">→</span>
-          </button>
-
-          <button
-            onClick={() => navigate("/auth?returnTo=%2Fapp%2Fvoice")}
-            className="group rounded-full border border-white/10 hover:border-white/25 bg-black/30 px-3.5 sm:px-4 py-2 sm:py-2.5 text-[12.5px] sm:text-[13px] font-medium tracking-wide text-neutral-300 hover:text-white backdrop-blur-sm transition-all duration-300 flex items-center gap-2 active:scale-95"
-          >
-            <span className="flex items-center justify-center w-5 sm:w-5.5 h-5 sm:h-5.5 rounded-full border border-cyan-400/60 bg-cyan-950/40 text-cyan-300 text-[9px] sm:text-[10px] pl-0.5 shadow-[0_0_10px_rgba(0,217,255,0.3)] transition-transform duration-300 group-hover:scale-110">
-              ▶
-            </span>
-            <span>Watch Video</span>
-          </button>
-        </div>
       </div>
     </section>
   );
