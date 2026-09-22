@@ -296,12 +296,12 @@ function Hero() {
         <div
           className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
           style={{
-            width: "clamp(260px, 30vw, 440px)",
-            height: "clamp(40px, 6vh, 75px)",
-            bottom: "clamp(60px, 8.5vh, 105px)",
+            width: "clamp(320px, 36vw, 560px)",
+            height: "clamp(45px, 7vh, 85px)",
+            bottom: "clamp(55px, 8vh, 95px)",
             background:
-              "radial-gradient(ellipse 65% 55% at 50% 50%, rgba(1, 4, 10, 0.65) 0%, rgba(1, 4, 10, 0.25) 55%, transparent 80%)",
-            filter: "blur(14px)",
+              "radial-gradient(ellipse 65% 55% at 50% 50%, rgba(1, 4, 10, 0.7) 0%, rgba(1, 4, 10, 0.25) 55%, transparent 80%)",
+            filter: "blur(16px)",
           }}
         />
 
@@ -309,12 +309,12 @@ function Hero() {
         <div
           className="absolute left-1/2 -translate-x-1/2 transition-opacity duration-700 pointer-events-none"
           style={{
-            width: "clamp(380px, 46vw, 680px)",
-            height: "clamp(75px, 10vh, 130px)",
-            bottom: "clamp(55px, 8vh, 100px)",
+            width: "clamp(460px, 52vw, 840px)",
+            height: "clamp(90px, 12vh, 155px)",
+            bottom: "clamp(50px, 7.5vh, 90px)",
             background:
-              "radial-gradient(ellipse 70% 48% at 50% 50%, rgba(0, 225, 255, 0.2) 0%, rgba(0, 160, 245, 0.06) 50%, transparent 80%)",
-            filter: "blur(22px)",
+              "radial-gradient(ellipse 70% 48% at 50% 50%, rgba(0, 225, 255, 0.22) 0%, rgba(0, 160, 245, 0.07) 50%, transparent 80%)",
+            filter: "blur(24px)",
             opacity: isHovered ? 0.95 : 0.75,
           }}
         />
@@ -323,12 +323,12 @@ function Hero() {
         <div
           className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
           style={{
-            width: "clamp(320px, 38vw, 540px)",
-            height: "clamp(220px, 28vh, 340px)",
-            bottom: "clamp(65px, 9vh, 110px)",
+            width: "clamp(380px, 44vw, 640px)",
+            height: "clamp(240px, 30vh, 380px)",
+            bottom: "clamp(60px, 8.5vh, 105px)",
             background:
-              "radial-gradient(ellipse 55% 85% at 50% 100%, rgba(0, 215, 255, 0.12) 0%, rgba(0, 140, 240, 0.035) 60%, transparent 85%)",
-            filter: "blur(30px)",
+              "radial-gradient(ellipse 55% 85% at 50% 100%, rgba(0, 215, 255, 0.14) 0%, rgba(0, 140, 240, 0.04) 60%, transparent 85%)",
+            filter: "blur(32px)",
           }}
         />
 
@@ -336,12 +336,12 @@ function Hero() {
         <div
           className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-700 pointer-events-none"
           style={{
-            top: "58.5%",
-            width: "clamp(520px, 52vw, 820px)",
-            height: "clamp(520px, 52vw, 820px)",
+            top: "55.5%",
+            width: "clamp(680px, 66vw, 1080px)",
+            height: "clamp(680px, 66vw, 1080px)",
             background:
-              "radial-gradient(circle at 50% 50%, rgba(0, 210, 255, 0.08) 0%, rgba(0, 140, 230, 0.025) 45%, transparent 70%)",
-            filter: "blur(48px)",
+              "radial-gradient(circle at 50% 50%, rgba(0, 210, 255, 0.09) 0%, rgba(0, 140, 230, 0.03) 45%, transparent 70%)",
+            filter: "blur(54px)",
             opacity: isHovered ? 1 : 0.8,
           }}
         />
@@ -350,8 +350,8 @@ function Hero() {
         <div
           className="absolute top-0 left-1/2 -translate-x-1/2 pointer-events-none"
           style={{
-            width: "clamp(280px, 34vw, 480px)",
-            height: "38vh",
+            width: "clamp(300px, 36vw, 520px)",
+            height: "36vh",
             background:
               "radial-gradient(ellipse 55% 100% at 50% 0%, rgba(215, 245, 255, 0.11) 0%, rgba(140, 210, 255, 0.025) 60%, transparent 90%)",
             filter: "blur(26px)",
@@ -361,8 +361,8 @@ function Hero() {
 
       {/* =========================================================================
           LAYER 4: The real interactive NeoBrainCore
-          - Enlarged by ~2.3-2.5x to target 380-430px visual diameter on desktop
-          - Floats suspended 60-100px above the central circular floor platform
+          - Enlarged to a dominant, commanding visual presence
+          - Floats naturally above the central circular floor platform
           - Horizontally centered, responsive, uninhibited 3D interactivity
           ========================================================================= */}
       <motion.div
@@ -372,18 +372,18 @@ function Hero() {
         <div
           style={{
             position: "absolute",
-            top: "58.5%",
+            top: "55.5%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: "clamp(720px, 66vw, 1080px)",
-            height: "clamp(720px, 66vw, 1080px)",
+            width: "clamp(960px, 92vw, 1480px)",
+            height: "clamp(960px, 92vw, 1480px)",
           }}
           className="flex items-center justify-center pointer-events-none"
         >
           <div
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
-            className="pointer-events-auto relative group cursor-pointer w-full h-full transition-transform duration-500 hover:scale-[1.025]"
+            className="pointer-events-auto relative group cursor-pointer w-full h-full transition-transform duration-500 hover:scale-[1.02]"
           >
             <NeoBrainCore
               state={coreState}
@@ -405,14 +405,14 @@ function Hero() {
           LAYER 5: Navigation, Typography, and Flanking Architecture Overlays
           ========================================================================= */}
       {/* FLANKING LEFT PANEL: Intelligence that lives with you */}
-      <div className="absolute left-6 xl:left-14 top-[20%] z-[20] hidden md:flex flex-col gap-1.5 text-left pointer-events-none select-none">
+      <div className="absolute left-6 xl:left-14 top-[18%] z-[20] hidden md:flex flex-col gap-1.5 text-left pointer-events-none select-none">
         <span className="text-[10.5px] font-medium tracking-[0.28em] text-white/70 uppercase font-mono">INTELLIGENCE</span>
         <span className="text-[10.5px] font-medium tracking-[0.28em] text-white/70 uppercase font-mono">THAT LIVES</span>
         <span className="text-[10.5px] font-medium tracking-[0.28em] text-white/70 uppercase font-mono">WITH YOU</span>
       </div>
 
       {/* FLANKING RIGHT PANEL: Vertical cyan pipeline */}
-      <div className="absolute right-6 xl:right-14 top-[20%] z-[20] hidden md:flex items-stretch gap-3.5 text-left pointer-events-none select-none">
+      <div className="absolute right-6 xl:right-14 top-[18%] z-[20] hidden md:flex items-stretch gap-3.5 text-left pointer-events-none select-none">
         <div className="w-[1.5px] bg-gradient-to-b from-cyan-400 via-cyan-400/40 to-transparent shadow-[0_0_10px_rgba(0,217,255,0.7)]" />
         <div className="flex flex-col justify-between py-0.5 space-y-2.5 text-[10px] font-medium tracking-[0.24em] text-white/60 uppercase font-mono">
           <span className="hover:text-cyan-300 transition-colors">CAPTURE</span>
@@ -435,19 +435,19 @@ function Hero() {
         <span className="text-[9px] font-medium tracking-[0.26em] text-neutral-400 uppercase font-mono">A BRIGHTER YOU</span>
       </div>
 
-      {/* UPPER-MID TYPOGRAPHY BLOCK: Reduced by ~18%, clean breathing room */}
-      <div className="pointer-events-none relative z-[20] mx-auto flex h-full w-full max-w-[1360px] flex-col items-center justify-start px-6 pt-20 sm:pt-24 md:pt-26">
+      {/* UPPER-MID TYPOGRAPHY BLOCK */}
+      <div className="pointer-events-none relative z-[20] mx-auto flex h-full w-full max-w-[1360px] flex-col items-center justify-start px-6 pt-16 sm:pt-20 md:pt-22">
         <motion.div
           style={{ opacity: topTextFade, y: topTextY }}
           className="mx-auto flex flex-col items-center text-center will-change-transform"
         >
           {/* Eyebrow: YOUR SECOND BRAIN */}
-          <div className="text-[10.5px] sm:text-[12px] font-medium tracking-[0.38em] text-neutral-300/85 uppercase mb-2 sm:mb-2.5 select-none">
+          <div className="text-[10px] sm:text-[11.5px] font-medium tracking-[0.38em] text-neutral-300/85 uppercase mb-1.5 sm:mb-2 select-none">
             YOUR SECOND BRAIN
           </div>
 
-          {/* Main Heading: Reduced ~18% so Core takes primary visual priority */}
-          <h1 className="font-display text-[40px] sm:text-[56px] md:text-[70px] lg:text-[84px] font-bold tracking-[0.14em] sm:tracking-[0.16em] leading-none select-none">
+          {/* Main Heading */}
+          <h1 className="font-display text-[38px] sm:text-[52px] md:text-[66px] lg:text-[78px] font-bold tracking-[0.14em] sm:tracking-[0.16em] leading-none select-none">
             <span className="text-white drop-shadow-[0_4px_24px_rgba(255,255,255,0.25)]">NEO</span>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-[#38bdf8] to-cyan-300 drop-shadow-[0_0_36px_rgba(0,217,255,0.65)]">
               BRAIN
@@ -455,19 +455,19 @@ function Hero() {
           </h1>
 
           {/* Supporting Line */}
-          <p className="mt-2.5 sm:mt-3 text-[14px] sm:text-[16px] md:text-[18px] font-light tracking-[0.05em] text-neutral-200">
+          <p className="mt-2 sm:mt-2.5 text-[13.5px] sm:text-[15.5px] md:text-[17px] font-light tracking-[0.05em] text-neutral-200">
             Perceive. Remember. Connect.
           </p>
 
           {/* Secondary Text */}
-          <p className="mt-1 text-[12px] sm:text-[13px] text-neutral-400/90 font-normal max-w-[46ch]">
+          <p className="mt-0.5 sm:mt-1 text-[11.5px] sm:text-[12.5px] text-neutral-400/90 font-normal max-w-[46ch]">
             An intelligent memory layer for everything you do.
           </p>
         </motion.div>
       </div>
 
       {/* BOTTOM ACTION CTAs: Clean vertical separation beneath the Core */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-7 sm:bottom-8 lg:bottom-9 z-[30] flex items-center justify-center px-6">
+      <div className="pointer-events-none absolute inset-x-0 bottom-6 sm:bottom-7 lg:bottom-8 z-[30] flex items-center justify-center px-6">
         <div className="pointer-events-auto flex items-center justify-center gap-3 sm:gap-4">
           <button
             onClick={() => navigate("/auth?returnTo=%2Fapp%2Fboot")}
