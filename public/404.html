@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>NeoBrain</title>
+    <meta name="robots" content="noindex" />
+    <script>
+      // SPA fallback for static hosts.
+      //
+      // NeoBrain uses client-side routing, so a hard refresh on a deep link such
+      // as /app/memory asks the host for a file that does not exist. This page
+      // hands the requested path back to the app, which restores it with
+      // history.replaceState before the router mounts (see src/main.tsx).
+      (function () {
+        var target = window.location.pathname + window.location.search + window.location.hash;
+        window.location.replace("/index.html?p=" + encodeURIComponent(target));
+      })();
+    </script>
+  </head>
+  <body style="background: #04090e; color: #91aab8; font-family: system-ui, sans-serif">
+    <p style="padding: 24px">
+      Loading NeoBrain… <a href="/" style="color: #00d9ff">Continue</a>
+    </p>
+  </body>
+</html>
