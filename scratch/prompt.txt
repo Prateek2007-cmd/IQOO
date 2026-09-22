@@ -1,0 +1,906 @@
+<USER_REQUEST>
+@[https://chatgpt.com/backend-api/estuary/content?id%3Dfile_00000000e63082119418b78d0094a7d5%26ts%3D497242%26p%3Dfs%26cid%3D1%26sig%3Da98326a4cecd29221302f1df4f340b6c0251d246396d11f7c87a531764847293%26v%3D0] NEOBRAIN — PREMIUM APP UI REFINEMENT
+
+Refactor the ENTIRE NeoBrain application interface so that every screen feels like the same premium product as the new cinematic NeoBrain landing page.
+
+IMPORTANT:
+
+Do NOT redesign the landing page.
+
+Do NOT change the existing NeoBrain 3D Core.
+
+Do NOT replace the existing functionality.
+
+Do NOT simply change the background color.
+
+The current app feels like a conventional SaaS dashboard with pale cards and ordinary UI components.
+
+The goal is to transform the ENTIRE APP from a generic dashboard into a premium futuristic personal-computing interface.
+
+The user should feel:
+
+"I am operating my second brain."
+
+Not:
+
+"I am using an AI SaaS dashboard."
+
+==================================================
+1. GLOBAL VISUAL LANGUAGE
+==================================================
+
+Every screen must use the same visual language as the landing page.
+
+Design references:
+
+premium aerospace computing
+luxury smartphone hardware
+spatial computing
+cinematic AI interface
+dark futuristic operating system
+high-end command center
+
+The interface should feel engineered, precise and expensive.
+
+Avoid:
+
+white cards
+light gray panels
+generic SaaS dashboards
+standard Bootstrap-style components
+flat backgrounds
+excessive glassmorphism
+large rectangular containers
+random gradients
+gaming RGB
+cheap neon effects
+generic chatbot UI
+
+==================================================
+2. GLOBAL COLOR SYSTEM
+==================================================
+
+Use ONLY this visual palette.
+
+DEEP SPACE
+#020407
+
+BACKGROUND
+#0A0F1C
+
+SURFACE
+#0F1B2D
+
+PANEL
+#1E2A3F
+
+PRIMARY CYAN
+#00D1FF
+
+ACCENT BLUE
+#3882F6
+
+ACCENT PURPLE
+#885CF6
+
+WARM ACCENT
+#F59E0B
+
+PRIMARY TEXT
+#E2E8F0
+
+SECONDARY TEXT
+#94A3B8
+
+BORDER
+#334155
+
+Do not introduce unrelated colors.
+
+CYAN should represent:
+
+active
+intelligence
+connection
+interaction
+important system activity
+
+BLUE should represent:
+
+environment
+depth
+information
+
+PURPLE should represent:
+
+knowledge
+relationships
+advanced computation
+
+ORANGE should represent:
+
+physical hardware
+attention
+important events
+
+Keep purple and orange extremely restrained.
+
+==================================================
+3. BACKGROUND
+==================================================
+
+Remove the flat/pale application background.
+
+The entire application should exist inside a deep computational environment.
+
+Base background:
+
+#020407
+
+Layer subtle:
+
+deep blue atmospheric gradients
+very faint cyan light pools
+sparse particles
+subtle technical grid
+very thin neural lines
+soft radial lighting
+extremely subtle orbital arcs
+
+The background must remain mostly dark.
+
+Do NOT create a giant galaxy wallpaper.
+
+Do NOT make the UI look like it is floating over a stock space image.
+
+The background should feel like a subtle computational atmosphere.
+
+==================================================
+4. SIDEBAR
+==================================================
+
+Transform the sidebar into a premium NeoBrain control surface.
+
+Dark near-black background.
+
+Width approximately 240–260px.
+
+Very subtle right border.
+
+Logo:
+
+NEOBRAIN
+
+Small tagline:
+
+YOUR SECOND BRAIN.
+ALWAYS WITH YOU.
+
+Navigation:
+
+Overview
+Ask Brain
+Memory
+Knowledge
+Projects
+Timeline
+Activity
+
+System:
+
+Devices
+Privacy
+Settings
+
+ACTIVE NAVIGATION:
+
+Do NOT use a generic filled blue rectangle.
+
+Use:
+
+thin cyan vertical indicator
+subtle cyan glow
+slightly brighter text
+very dark translucent surface
+soft border
+
+Example visual behavior:
+
+inactive:
+muted blue-gray
+
+active:
+white/cyan text
+cyan signal line
+very subtle atmospheric glow
+
+Icons should be thin, precise line icons.
+
+Avoid oversized icons.
+
+==================================================
+5. TOP BAR
+==================================================
+
+Create a premium command bar.
+
+Dark translucent background.
+
+Very subtle bottom border.
+
+Search:
+
+"Search memories, files, conversations, projects..."
+
+The search field should feel like a command interface.
+
+Use:
+
+dark translucent surface
+thin border
+soft inner highlight
+subtle cyan focus state
+
+Right side:
+
+Voice Mode
+Ask
+Notifications
+Profile
+
+Buttons should be compact.
+
+Do NOT use large rounded SaaS buttons.
+
+==================================================
+6. TYPOGRAPHY
+==================================================
+
+Use:
+
+Space Grotesk or similar geometric grotesk
+for major headings.
+
+Inter or similar clean sans-serif
+for body and interface.
+
+Headings:
+
+large
+clean
+high contrast
+slightly tight tracking
+
+Body:
+
+soft gray-blue
+
+Technical labels:
+
+uppercase
+small
+letter spacing
+cyan/blue-gray
+
+Example:
+
+YOUR BRAIN STATUS
+
+not:
+
+Your Brain Status
+
+Major heading example:
+
+ALL SYSTEMS READY.
+
+Subheading:
+
+Capturing. Understanding. Remembering.
+
+Typography must create hierarchy without requiring huge cards.
+
+==================================================
+7. COMPONENT SYSTEM
+==================================================
+
+This is extremely important.
+
+STOP treating every piece of information as a card.
+
+Use three levels.
+
+LEVEL 1 — OPEN SPACE
+
+Large visual information.
+
+Examples:
+
+Brain visualization
+Knowledge graph
+Memory timeline
+Device connections
+Waveforms
+
+LEVEL 2 — FLOATING PANELS
+
+Use for grouped information.
+
+Appearance:
+
+#0F1B2D / #1E2A3F
+with low opacity
+
+border:
+
+rgba(51,65,85,0.5)
+
+border radius:
+
+18–24px
+
+subtle shadow
+
+subtle cyan reflection
+
+No white backgrounds.
+
+LEVEL 3 — MICRO MODULES
+
+Small technical information:
+
+status
+timestamps
+source
+device state
+memory metadata
+activity
+
+These should not look like cards.
+
+They should feel like technical instrumentation.
+
+==================================================
+8. DASHBOARD OVERVIEW
+==================================================
+
+Transform the current Overview page.
+
+Top:
+
+Good afternoon, Prateek.
+
+Subheading:
+
+Ideas, files and conversations. All connected.
+
+Make the greeting large and cinematic.
+
+Do NOT immediately place four generic statistic cards underneath.
+
+Instead create a visual hierarchy.
+
+Primary area:
+
+YOUR BRAIN STATUS
+
+Show the real NeoBrain Core / brain visualization here.
+
+Around it:
+
+CAPTURE
+UNDERSTAND
+REMEMBER
+CONNECT
+EVOLVE
+
+Connected devices:
+
+DEEP BRAIN
+POCKET BRAIN
+
+Use small premium device modules.
+
+Secondary information:
+
+Memories
+Files indexed
+Active projects
+Open tasks
+
+These should become compact telemetry modules rather than generic cards.
+
+==================================================
+9. BRAIN STATUS
+==================================================
+
+This should be the visual centerpiece of the dashboard.
+
+Use the existing NeoBrain Core if available.
+
+Do NOT create a fake replacement.
+
+Place it inside a dark spatial environment.
+
+Very subtle:
+
+cyan floor reflection
+orbital traces
+particles
+ambient glow
+
+Around it:
+
+CAPTURE
+UNDERSTAND
+REMEMBER
+CONNECT
+EVOLVE
+
+Device status should sit around the Core.
+
+This should feel like a futuristic system console.
+
+==================================================
+10. QUICK ACTIONS
+==================================================
+
+Do not make boring rectangular buttons.
+
+Actions:
+
+Ask your brain
+Summarize today
+Add memory
+Open timeline
+
+Use compact dark modules with:
+
+icon
+title
+short description
+arrow
+
+Hover:
+
+thin cyan border
+subtle glow
+slight elevation
+
+==================================================
+11. RECENT ACTIVITY
+==================================================
+
+Replace ordinary list styling with a timeline.
+
+Each event should have:
+
+small colored signal node
+vertical connection line
+event title
+context
+timestamp
+
+Example:
+
+DEEP BRAIN CONNECTED
+Laptop paired · local sync complete
+
+PROJECT UPDATED
+SmartLine / Bearing analysis
+
+MEMORY CAPTURED
+Voice · Transcribed
+
+FILE INDEXED
+vibration_report.pdf
+
+IMPORTANT DECISION
+"Use FFT for anomaly detection"
+
+The timeline should feel like system telemetry.
+
+==================================================
+12. INSIGHTS
+==================================================
+
+Replace ordinary statistic cards with visual intelligence modules.
+
+Example:
+
+PATTERNS EMERGING.
+
+Top topic
+Vibration analysis
+
+Key project
+SmartLine
+
+Focus time
+3h 24m
+
+Top source
+Conversations
+
+Use tiny visualizations:
+
+mini waveform
+small bars
+thin progress ring
+micro graph
+
+Do NOT use colorful generic charts.
+
+Everything should remain dark and precise.
+
+==================================================
+13. ASK BRAIN
+==================================================
+
+The Ask Brain screen should NOT look like ChatGPT.
+
+Create an immersive intelligence interface.
+
+Large question field:
+
+"What do you want to know?"
+
+Example:
+
+Where did I see that presentation?
+
+Then:
+
+THINKING ACROSS YOUR BRAIN...
+
+Use the NeoBrain Core.
+
+When the answer appears:
+
+ANSWER
+
+I found it in your SmartLine project.
+
+Then:
+
+SOURCE
+SmartLine / Presentation
+
+EVIDENCE
+SmartLine design notes
+MSME Hackathon draft
+Bearing vibration analysis
+
+RELATED MEMORIES
+
+Use layered evidence panels.
+
+The source/evidence hierarchy is more important than decorative UI.
+
+==================================================
+14. MEMORY
+==================================================
+
+The Memory page should feel like entering a neural archive.
+
+Avoid card grids.
+
+Use:
+
+large timeline
+memory nodes
+connections
+categories
+search
+filters
+
+Categories:
+
+ALL
+PEOPLE
+PROJECTS
+IDEAS
+DECISIONS
+
+Memory entries should appear as structured events.
+
+Important memories can have a subtle cyan glow.
+
+Older memories become visually quieter.
+
+==================================================
+15. KNOWLEDGE
+==================================================
+
+This should be one of the most visually impressive screens.
+
+Full dark space.
+
+Large interactive knowledge graph.
+
+Nodes:
+
+PROJECT
+PERSON
+IDEA
+FILE
+DECISION
+MEMORY
+
+Thin glowing connections.
+
+Particles move along important relationships.
+
+Hovering a node:
+
+highlight connected nodes
+dim unrelated nodes
+show compact contextual HUD
+
+Do not surround every node with a card.
+
+==================================================
+16. PROJECTS
+==================================================
+
+Projects should feel like intelligent environments.
+
+Example:
+
+NEOBRAIN
+SMARTLINE
+AERIS-TWIN
+ACADEMIC
+
+Show:
+
+memory count
+recent activity
+connected files
+decisions
+knowledge relationships
+
+Opening a project should reveal its memory graph and context.
+
+Do NOT turn this into Trello/Jira-style cards.
+
+==================================================
+17. TIMELINE
+==================================================
+
+Create a cinematic chronological memory stream.
+
+Use:
+
+vertical line
+memory nodes
+dates
+events
+context
+
+Allow the user to move through their personal history.
+
+Use subtle zoom and depth.
+
+==================================================
+18. DEVICES
+==================================================
+
+Create a premium device ecosystem screen.
+
+DEEP BRAIN
+
+Laptop
+
+POCKET BRAIN
+
+Phone
+
+Show:
+
+connection state
+processing
+memory sync
+last activity
+
+Use realistic device silhouettes or subtle device representations.
+
+Do not use generic icon cards.
+
+==================================================
+19. PRIVACY
+==================================================
+
+Privacy should feel like a secure control room.
+
+Title:
+
+YOUR MEMORY. YOUR CONTROL.
+
+Display:
+
+LOCAL PROCESSING
+ON
+
+RAW AUDIO
+OFF
+
+CLOUD UPLOAD
+OFF
+
+MEMORY CONTROL
+AVAILABLE
+
+DEVICE CONTROL
+ENABLED
+
+Use technical status indicators.
+
+Do NOT make unsupported security claims.
+
+Do not use the term "air-gapped" unless the actual architecture is air-gapped.
+
+==================================================
+20. SETTINGS
+==================================================
+
+Keep settings minimal and premium.
+
+Sections:
+
+Appearance
+Memory
+Listening
+Devices
+Privacy
+Notifications
+About
+
+Use clean technical controls.
+
+Toggles should be thin and elegant.
+
+Avoid giant switches.
+
+==================================================
+21. CORE VISUAL LANGUAGE
+==================================================
+
+The NeoBrain Core must become a recurring visual identity.
+
+Use it in:
+
+Dashboard
+Ask Brain
+Device state
+Loading/thinking states
+Voice mode
+Final interactions
+
+But do NOT place the Core everywhere.
+
+It should remain special.
+
+Whenever it appears, give it sufficient negative space.
+
+==================================================
+22. MOTION
+==================================================
+
+The application should feel alive.
+
+Use:
+
+slow atmospheric particles
+subtle gradients
+soft hover elevation
+cyan signal pulses
+neural line movement
+smooth page transitions
+micro-interactions
+
+Avoid:
+
+bouncing cards
+constant pulsing
+RGB animation
+excessive glow
+fast animations
+gaming effects
+
+Motion should communicate system state.
+
+==================================================
+23. PREMIUM MATERIAL SYSTEM
+==================================================
+
+Every surface should have subtle depth.
+
+Use combinations of:
+
+dark graphite
+smoked glass
+soft translucent surfaces
+thin metallic borders
+cyan reflections
+deep shadows
+
+Do not make everything transparent.
+
+Some surfaces should be almost black.
+
+Some should have subtle blue-gray depth.
+
+This variation is essential.
+
+==================================================
+24. RESPONSIVE
+==================================================
+
+Desktop:
+
+cinematic command center
+
+Tablet:
+
+simplified spatial layout
+
+Mobile:
+
+prioritize:
+
+Core
+Ask
+Memory
+Voice
+
+Do not simply shrink the desktop dashboard.
+
+Recompose it for mobile.
+
+==================================================
+25. FINAL QUALITY TEST
+==================================================
+
+Compare every screen against the NeoBrain landing page.
+
+Ask:
+
+Does this look like the same company?
+
+Does this look like the same product?
+
+Does the same lighting language exist?
+
+Does the same typography exist?
+
+Does the same cyan signal language exist?
+
+Does the same material language exist?
+
+If the answer is no, refine the screen.
+
+The final application should feel like:
+
+THE LANDING PAGE WAS THE DOOR.
+
+THIS APP IS THE WORLD BEHIND THE DOOR.
+
+Every screen must maintain the same premium visual quality from the first pixel to the last.
+
+Do not add more components just to make the UI look complex.
+
+Premium = restraint + hierarchy + depth + precision.
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-09-22T16:17:29+05:30.
+
+The user has mentioned some items in the form @[ITEM]. Here is extra information about the items that were mentioned by the user, in the order that they appear:
+
+@[https://chatgpt.com/backend-api/estuary/content?id%3Dfile_00000000e63082119418b78d0094a7d5%26ts%3D497242%26p%3Dfs%26cid%3D1%26sig%3Da98326a4cecd29221302f1df4f340b6c0251d246396d11f7c87a531764847293%26v%3D0] is a [File]:
+https://chatgpt.com/backend-api/estuary/content?id%3Dfile_00000000e63082119418b78d0094a7d5%26ts%3D497242%26p%3Dfs%26cid%3D1%26sig%3Da98326a4cecd29221302f1df4f340b6c0251d246396d11f7c87a531764847293%26v%3D0
+
+The user has uploaded 1 image(s):
+- C:/Users/Prateek/.gemini/antigravity/brain/38581513-1151-48d0-8ac4-d059eb97894b/.user_uploaded/media_1790073893192.jpg
+You can embed this image in an artifact if you need the USER to review it.
+</ADDITIONAL_METADATA>

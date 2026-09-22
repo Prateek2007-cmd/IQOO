@@ -9,6 +9,7 @@
 import {
   Activity,
   Check,
+  Cpu,
   Mic,
   MicOff,
   Pin,
@@ -118,29 +119,29 @@ export default function BrainConsole() {
   };
 
   const listeningCard = (
-    <Panel className="p-5">
+    <Panel className="p-6">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <TechLabel tone={listening ? "cyan" : "muted"}>
-            {listening ? "Listening" : "Standby"}
+            {listening ? "Perception Active" : "Perception Standby"}
           </TechLabel>
-          <h2 className="mt-2 text-[16px] font-semibold text-txt-primary">
-            {listening ? "Speech detection active" : "NeoBrain is idle"}
+          <h2 className="mt-2 text-[17px] font-semibold text-txt-primary">
+            {listening ? "Local Speech Detection Engaged" : "NeoBrain Core Idle"}
           </h2>
-          <p className="mt-1.5 max-w-[46ch] text-[12px] leading-relaxed text-txt-secondary">
+          <p className="mt-1.5 max-w-[50ch] text-[12.5px] leading-relaxed text-txt-secondary">
             {listening
               ? mic.mode === "live"
-                ? "Microphone is open on this device. Audio is processed locally and never stored."
-                : "Simulated input is running because browser speech recognition is unavailable."
-              : "Nothing is being recorded. Start listening only when you want NeoBrain to capture context."}
+                ? "Microphone is open on this device. Audio is converted into embeddings locally and never recorded."
+                : "Simulated audio buffer is running because browser speech recognition is in development fallback mode."
+              : "No sensors active. Engage perception only when you wish to stream context into your second brain."}
           </p>
-          <div className="mt-3.5 flex flex-wrap items-center gap-2">
-            <Chip as="span" active={listening}>
-              <Waves size={11} />
-              {mic.mode === "live" ? "Live mic" : "Simulated"}
-            </Chip>
-            <Chip as="span">{speech.label}</Chip>
-            <Chip as="span">Raw audio: off</Chip>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <span className="micro-module text-cyanx border-cyanx/30">
+              <Waves size={10} className="inline mr-1 -mt-0.5" />
+              {mic.mode === "live" ? "Live Mic Buffer" : "Simulated Buffer"}
+            </span>
+            <span className="micro-module">{speech.label}</span>
+            <span className="micro-module text-greenx border-greenx/30">Raw Audio: Off</span>
           </div>
         </div>
         <button
@@ -148,28 +149,28 @@ export default function BrainConsole() {
           onClick={() => void toggleListening()}
           aria-pressed={listening}
           className={[
-            "relative grid h-14 w-14 shrink-0 place-items-center rounded-full border transition-all duration-400 ease-premium",
+            "relative grid h-16 w-16 shrink-0 place-items-center rounded-2xl border transition-all duration-300 ease-premium",
             listening
-              ? "border-cyanx/60 bg-[radial-gradient(70%_70%_at_50%_20%,rgba(0,217,255,0.35),rgba(8,21,33,0.9))] shadow-[0_0_36px_-8px_rgba(0,217,255,0.9)]"
-              : "border-line-soft bg-ink-800/80 hover:border-line-strong",
+              ? "border-cyanx bg-[radial-gradient(70%_70%_at_50%_20%,rgba(0,209,255,0.4),rgba(15,27,45,0.9))] shadow-[0_0_30px_rgba(0,209,255,0.5)]"
+              : "border-border bg-panel hover:border-line-soft",
           ].join(" ")}
           aria-label={listening ? "Stop listening" : "Start listening"}
         >
-          {listening ? <Mic size={20} className="text-cyanx" /> : <MicOff size={20} className="text-txt-secondary" />}
+          {listening ? <Mic size={22} className="text-cyanx" /> : <MicOff size={22} className="text-txt-secondary" />}
           {listening ? (
-            <span className="absolute inset-0 animate-ping rounded-full border border-cyanx/40" />
+            <span className="absolute inset-0 animate-ping rounded-2xl border border-cyanx/40" />
           ) : null}
         </button>
       </div>
 
-      <div className="mt-4 flex items-end gap-[3px]" aria-hidden="true">
-        {Array.from({ length: 40 }).map((_, index) => {
-          const target = listening ? 0.25 + mic.level * Math.abs(Math.sin(index * 0.62)) : 0.12;
+      <div className="mt-5 flex items-end gap-[3px]" aria-hidden="true">
+        {Array.from({ length: 44 }).map((_, index) => {
+          const target = listening ? 0.25 + mic.level * Math.abs(Math.sin(index * 0.62)) : 0.1;
           return (
             <span
               key={index}
-              className="flex-1 rounded-full bg-gradient-to-t from-bluex/40 via-cyanx to-magentax/70 transition-[height] duration-200 ease-out"
-              style={{ height: `${6 + target * 30}px`, opacity: 0.3 + target * 0.7 }}
+              className="flex-1 rounded-full bg-gradient-to-t from-bluex/40 via-cyanx to-purplex/70 transition-[height] duration-200 ease-out"
+              style={{ height: `${6 + target * 32}px`, opacity: 0.3 + target * 0.7 }}
             />
           );
         })}
@@ -180,7 +181,7 @@ export default function BrainConsole() {
           <StateBlock
             kind="mic"
             title={mic.error}
-            description="Enable microphone access in your browser settings, or use text capture below."
+            description="Enable microphone access in your browser settings, or use manual text classification below."
             compact
           />
         </div>
@@ -189,11 +190,11 @@ export default function BrainConsole() {
   );
 
   const captureCard = (
-    <Panel className="p-5">
-      <SectionHeading label="Memory engine" title="Capture something" />
-      <p className="mt-2 text-[12px] leading-relaxed text-txt-secondary">
-        Runs the local pipeline: context → importance → memory decision. You always see the reason
-        before anything is stored.
+    <Panel className="p-6">
+      <SectionHeading label="Neural Pipeline" title="Deterministic Semantic Classifier" />
+      <p className="mt-2 text-[12.5px] leading-relaxed text-txt-secondary">
+        Executes local pipeline: context stream → temporal relevance → memory classification. Every rule execution is
+        transparently rendered before committing to graph memory.
       </p>
 
       <form
@@ -207,58 +208,56 @@ export default function BrainConsole() {
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
           rows={3}
-          placeholder="e.g. “Decided to use XGBoost instead of the neural baseline for SmartLine.”"
-          className="input h-auto resize-none py-3 leading-relaxed"
+          placeholder="e.g. “Decided to adopt local IndexedDB vector storage for zero-latency retrieval in SmartLine.”"
+          className="input h-auto resize-none py-3 leading-relaxed bg-surface border-border"
           aria-label="Capture text"
         />
-        <div className="mt-3 flex flex-wrap items-center gap-2">
+        <div className="mt-3.5 flex flex-wrap items-center gap-2.5">
           <Button type="submit" variant="primary" size="sm" disabled={!draft.trim()}>
-            <Sparkles size={13} /> Classify
+            <Sparkles size={13} /> Classify Input
           </Button>
-          <Button type="button" size="sm" variant="ghost" onClick={() => navigate("/app/voice")}>
-            <Mic size={13} /> Use voice instead
+          <Button type="button" size="sm" variant="secondary" onClick={() => navigate("/app/voice")}>
+            <Mic size={13} /> Voice Mode
           </Button>
-          <span className="ml-auto text-[10.5px] text-txt-muted">{providers.inference.label}</span>
+          <span className="ml-auto font-mono text-[11px] text-txt-muted">{providers.inference.label}</span>
         </div>
       </form>
 
       {proposal ? (
-        <div className="mt-4 rounded-lg border border-cyanx/25 bg-[linear-gradient(180deg,rgba(0,217,255,0.08)_0%,rgba(7,16,25,0.6)_100%)] p-4">
+        <div className="mt-5 rounded-2xl border border-cyanx/35 bg-gradient-to-b from-[#0F1B2D] to-space p-5 shadow-[0_0_24px_rgba(0,209,255,0.08)]">
           <div className="flex items-center justify-between gap-3">
             <TechLabel tone="cyan">
-              {proposal.proposal ? "Memory candidate" : "Discarded"}
+              {proposal.proposal ? "Candidate Memory Identified" : "Signal Discarded"}
             </TechLabel>
-            <span className="numeral text-[11px] text-txt-muted">
-              confidence {Math.round(proposal.confidence * 100)}%
+            <span className="font-mono text-[11px] text-cyanx font-semibold">
+              Confidence {Math.round(proposal.confidence * 100)}%
             </span>
           </div>
 
           {proposal.proposal ? (
             <>
-              <div className="mt-2.5 text-[13.5px] font-medium text-txt-primary">
+              <div className="mt-3 text-[14px] font-semibold text-txt-primary">
                 {proposal.proposal.title}
               </div>
-              <p className="mt-1.5 text-[12px] leading-relaxed text-txt-secondary">
+              <p className="mt-1.5 text-[12.5px] leading-relaxed text-txt-secondary">
                 {proposal.proposal.content}
               </p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <Chip as="span" active>
-                  {proposal.category}
-                </Chip>
-                <Chip as="span">{proposal.importance}</Chip>
-                <Chip as="span">retention: {proposal.retentionType}</Chip>
+              <div className="mt-3.5 flex flex-wrap gap-2">
+                <span className="micro-module text-cyanx border-cyanx/40 capitalize">{proposal.category}</span>
+                <span className="micro-module uppercase">{proposal.importance}</span>
+                <span className="micro-module font-mono">Retention: {proposal.retentionType}</span>
                 {proposal.projectId ? (
-                  <Chip as="span">
+                  <span className="micro-module text-bluex">
                     {state.projects.find((project) => project.id === proposal.projectId)?.name}
-                  </Chip>
+                  </span>
                 ) : null}
               </div>
-              <p className="mt-3 text-[11px] leading-relaxed text-txt-muted">
-                Rule that fired: {proposal.reason}
+              <p className="mt-3 font-mono text-[11px] leading-relaxed text-txt-muted">
+                Heuristic Rule: {proposal.reason}
               </p>
-              <div className="mt-3.5 flex gap-2">
+              <div className="mt-4 flex gap-2">
                 <Button size="sm" variant="primary" onClick={commitProposal}>
-                  <Check size={13} /> Store memory
+                  <Check size={13} /> Commit to Graph
                 </Button>
                 <Button size="sm" variant="ghost" onClick={() => setProposal(null)}>
                   Discard
@@ -267,7 +266,7 @@ export default function BrainConsole() {
             </>
           ) : (
             <>
-              <p className="mt-2.5 text-[12.5px] text-txt-secondary">{proposal.reason}</p>
+              <p className="mt-3 text-[12.5px] text-txt-secondary">{proposal.reason}</p>
               <div className="mt-3 flex gap-2">
                 <Button size="sm" variant="ghost" onClick={() => setProposal(null)}>
                   Dismiss
@@ -279,51 +278,51 @@ export default function BrainConsole() {
       ) : null}
 
       {lastCapture && !proposal ? (
-        <p className="mt-3 text-[11px] text-txt-muted">
-          Last input: “{lastCapture.slice(0, 64)}{lastCapture.length > 64 ? "…" : ""}”
+        <p className="mt-3 font-mono text-[11px] text-txt-muted">
+          Last input stream: “{lastCapture.slice(0, 64)}{lastCapture.length > 64 ? "…" : ""}”
         </p>
       ) : null}
     </Panel>
   );
 
   const candidatesCard = (
-    <Panel className="p-5">
+    <Panel className="p-6">
       <SectionHeading
-        label="Review"
-        title={`Candidates · ${candidates.length}`}
+        label="Review Queue"
+        title={`Pending Candidates · ${candidates.length}`}
         action={
-          <Link to="/app/memory" className="text-[11.5px] text-cyanx">
-            All memories
+          <Link to="/app/memory" className="font-mono text-[11px] text-cyanx hover:underline">
+            All Memories →
           </Link>
         }
       />
-      <div className="mt-3.5 space-y-2.5">
+      <div className="mt-4 space-y-2.5">
         {candidates.length === 0 ? (
           <StateBlock
             kind="empty"
-            title="No candidates waiting"
-            description="Captures that need your decision appear here before they become long-term memories."
+            title="Review Queue Clear"
+            description="High-uncertainty captures that require operator affirmation gather here."
             compact
           />
         ) : (
           candidates.map((candidate) => (
-            <div key={candidate.id} className="rounded-md border border-amberx/25 bg-amberx/[0.06] p-3.5">
+            <div key={candidate.id} className="rounded-xl border border-amberx/30 bg-amberx/[0.05] p-3.5">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <div className="truncate text-[13px] font-medium text-txt-primary">{candidate.title}</div>
-                  <p className="mt-1 line-clamp-2 text-[11.5px] leading-relaxed text-txt-secondary">
+                  <div className="truncate text-[13.5px] font-semibold text-txt-primary">{candidate.title}</div>
+                  <p className="mt-1 line-clamp-2 text-[12px] leading-relaxed text-txt-secondary">
                     {candidate.content}
                   </p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    <Chip as="span">{candidate.category}</Chip>
-                    <Chip as="span">{candidate.importance}</Chip>
-                    <span className="text-[10.5px] text-txt-muted">{relativeTime(candidate.createdAt, now)}</span>
+                  <div className="mt-2.5 flex flex-wrap gap-2">
+                    <span className="micro-module text-amberx capitalize">{candidate.category}</span>
+                    <span className="micro-module uppercase">{candidate.importance}</span>
+                    <span className="font-mono text-[10.5px] text-txt-muted">{relativeTime(candidate.createdAt, now)}</span>
                   </div>
                 </div>
                 <div className="flex shrink-0 gap-1.5">
                   <button
                     type="button"
-                    className="icon-btn h-8 w-8 text-greenx"
+                    className="icon-btn h-8 w-8 text-greenx border-border hover:border-greenx"
                     aria-label="Accept candidate"
                     onClick={() => {
                       acceptCandidate(candidate.id);
@@ -339,7 +338,7 @@ export default function BrainConsole() {
                   </button>
                   <button
                     type="button"
-                    className="icon-btn h-8 w-8 text-dangerx"
+                    className="icon-btn h-8 w-8 text-dangerx border-border hover:border-dangerx"
                     aria-label="Reject candidate"
                     onClick={() => {
                       rejectCandidate(candidate.id);
@@ -363,17 +362,17 @@ export default function BrainConsole() {
   );
 
   const activityCard = (
-    <Panel className="p-5">
+    <Panel className="p-6">
       <SectionHeading
-        label="Live"
-        title="What NeoBrain is doing"
+        label="Event Stream"
+        title="Live Execution Audit"
         action={
-          <Link to="/app/activity" className="flex items-center gap-1 text-[11.5px] text-cyanx">
-            See all <Activity size={12} />
+          <Link to="/app/activity" className="flex items-center gap-1 font-mono text-[11px] text-cyanx hover:underline">
+            Full Audit <Activity size={12} />
           </Link>
         }
       />
-      <div className="mt-3">
+      <div className="mt-4">
         <ActivityTimeline events={state.activity} limit={7} now={now} />
       </div>
     </Panel>
@@ -384,19 +383,19 @@ export default function BrainConsole() {
       {!isDesktop ? <MobileTopBar title="Your Brain" tagline="Live console" /> : null}
 
       <div className={isDesktop ? "mx-auto max-w-[1240px] px-8 py-8" : "space-y-4 px-5 pb-8 pt-5"}>
-        {/* status strip */}
-        <div className="flex items-center gap-4">
-          <BrainCore state={listening ? "listening" : "idle"} size={isDesktop ? 150 : 110} intensity={mic.level} />
+        {/* Status Hero Banner */}
+        <div className="flex items-center gap-5 rounded-2xl border border-cyanx/30 bg-gradient-to-r from-surface/90 via-panel/60 to-space/90 p-5 shadow-[0_0_24px_rgba(0,209,255,0.06)]">
+          <BrainCore state={listening ? "listening" : "idle"} size={isDesktop ? 130 : 90} intensity={mic.level} />
           <div className="min-w-0 flex-1">
-            <TechLabel tone="cyan">Brain status</TechLabel>
+            <TechLabel tone="cyan">Neural Console</TechLabel>
             <h1 className={`mt-1.5 ${isDesktop ? "title-lg" : "title-md"}`}>
-              {listening ? "Listening locally" : "Ready when you are"}
+              {listening ? "Perception Active · Local Processing" : "Autonomous Standby"}
             </h1>
-            <p className="mt-1.5 text-[12px] text-txt-secondary">
-              {counts.memories} memories · {counts.filesIndexed} files indexed · {counts.candidates} awaiting review
+            <p className="mt-1 text-[13px] text-txt-secondary">
+              {counts.memories} memories in graph · {counts.filesIndexed} indexed documents · {counts.candidates} awaiting confirmation
             </p>
             {isDesktop ? (
-              <div className="mt-3.5 max-w-[380px]">
+              <div className="mt-3 max-w-[400px]">
                 <Progress value={counts.filesIndexed / Math.max(1, counts.filesTotal)} showLabel />
               </div>
             ) : null}
@@ -404,22 +403,22 @@ export default function BrainConsole() {
         </div>
 
         {isDesktop ? (
-          <div className="mt-6 grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="space-y-5">
+          <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+            <div className="space-y-6">
               {listeningCard}
               {captureCard}
             </div>
-            <div className="space-y-5">
+            <div className="space-y-6">
               {activityCard}
               {candidatesCard}
-              <Panel className="p-5">
-                <SectionHeading label="Shortcuts" title="More ways to capture" />
-                <div className="mt-3.5 grid gap-2 sm:grid-cols-2">
+              <Panel className="p-6">
+                <SectionHeading label="Direct Routes" title="Console Shortcuts" />
+                <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
                   {[
-                    { icon: Mic, label: "Voice mode", to: "/app/voice" },
-                    { icon: Pin, label: "Ask a question", to: "/app/ask" },
-                    { icon: Sparkles, label: "Knowledge graph", to: "/app/knowledge" },
-                    { icon: Waves, label: "Timeline", to: "/app/timeline" },
+                    { icon: Mic, label: "Voice Perception Mode", to: "/app/voice" },
+                    { icon: Pin, label: "Ask Deep Brain", to: "/app/ask" },
+                    { icon: Sparkles, label: "3D Knowledge Graph", to: "/app/knowledge" },
+                    { icon: Waves, label: "Temporal Timeline", to: "/app/timeline" },
                   ].map((item) => {
                     const Icon = item.icon;
                     return (
@@ -427,7 +426,7 @@ export default function BrainConsole() {
                         key={item.label}
                         type="button"
                         onClick={() => navigate(item.to)}
-                        className="flex items-center gap-2.5 rounded-sm border border-line-subtle bg-ink-850/40 px-3 py-2.5 text-left text-[12.5px] text-txt-secondary transition-colors hover:border-line-soft hover:text-txt-primary"
+                        className="flex items-center gap-2.5 rounded-xl border border-border bg-panel/50 px-3.5 py-3 text-left font-mono text-[12px] text-txt-secondary transition-colors hover:border-cyanx/40 hover:text-txt-primary"
                       >
                         <Icon size={14} className="text-cyanx" />
                         {item.label}
@@ -444,15 +443,6 @@ export default function BrainConsole() {
             {captureCard}
             {candidatesCard}
             {activityCard}
-            <Panel className="p-4">
-              <div className="flex items-start gap-3">
-                <Sparkles size={15} className="mt-0.5 shrink-0 text-cyanx" />
-                <p className="text-[11.5px] leading-relaxed text-txt-secondary">
-                  The classifier is rule-based and inspectable in this build, not a language model.
-                  Every capture shows the rule that fired before it is stored.
-                </p>
-              </div>
-            </Panel>
           </>
         )}
       </div>

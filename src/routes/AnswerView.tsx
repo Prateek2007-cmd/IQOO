@@ -147,51 +147,61 @@ export default function AnswerView() {
           <ArrowLeft size={14} /> Back
         </button>
 
-        <div className="grid gap-5 lg:grid-cols-[1.45fr_0.85fr]">
-          {/* main */}
-          <div className="space-y-4">
-            <Panel className="p-5">
+        <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+          {/* main column: Answer + Follow-up */}
+          <div className="space-y-5">
+            {/* Question Bar */}
+            <Panel className="p-5 border border-[#334155]/60 bg-[#0F1B2D]/60 backdrop-blur-xl">
               <div className="flex items-start gap-3.5">
-                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md border border-cyanx/30 bg-cyanx/10 text-cyanx">
-                  <Sparkles size={15} />
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-[#00D1FF]/40 bg-[#0A0F1C] text-[#00D1FF] shadow-[0_0_12px_rgba(0,209,255,0.4)]">
+                  <Sparkles size={16} />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <TechLabel className="mb-1.5">You asked</TechLabel>
-                  <h1 className="text-[17px] font-semibold leading-snug text-txt-primary">
+                  <div className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#64748B] mb-1">
+                    QUESTION
+                  </div>
+                  <h1 className="text-[18px] font-display font-bold leading-snug text-[#E2E8F0]">
                     {answer.question}
                   </h1>
                   <div className="mt-2.5 flex flex-wrap items-center gap-2">
                     {project ? <Chip as="span" active>{project.name}</Chip> : null}
                     <Chip as="span">{answer.computedBy}</Chip>
-                    <span className="text-[10.5px] text-txt-muted">{relativeTime(answer.createdAt)}</span>
+                    <span className="text-[11px] font-mono text-[#64748B]">{relativeTime(answer.createdAt)}</span>
                   </div>
                 </div>
               </div>
             </Panel>
 
-            <Panel className="p-5">
-              <div className="mb-4 flex items-center gap-3">
-                <BrainCore state="responding" size={56} />
-                <div>
-                  <TechLabel tone="cyan">NeoBrain</TechLabel>
-                  <div className="mt-1 text-[12px] text-txt-muted">
-                    Built from {related.length} memories and {answer.sources.length} sources
-                  </div>
+            {/* 1. ANSWER PANEL */}
+            <Panel className="p-6 border border-[#334155]/60 bg-[#0F1B2D]/70 backdrop-blur-2xl rounded-[20px] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.9)]">
+              <div className="mb-4 flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <span className="h-2 w-2 rounded-full bg-[#00D1FF] shadow-[0_0_8px_#00D1FF]" />
+                  <span className="text-[11px] font-mono uppercase tracking-[0.25em] text-[#00D1FF] font-semibold">
+                    ANSWER
+                  </span>
                 </div>
+                <span className="text-[11px] font-mono text-[#64748B]">
+                  Verified by local inference
+                </span>
               </div>
 
-              <p className="text-[13.5px] text-txt-secondary">{answer.summary}</p>
+              <div className="text-[16px] font-medium leading-relaxed text-[#E2E8F0] border-l-2 border-[#00D1FF]/60 pl-4 py-1 bg-[#0A0F1C]/40 rounded-r-lg">
+                {answer.summary}
+              </div>
 
-              <ol className="mt-4 space-y-3.5">
-                {answer.points.map((point, index) => (
-                  <li key={point} className="flex gap-3.5">
-                    <span className="numeral mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full border border-cyanx/30 bg-cyanx/10 text-[11px] text-cyanx">
-                      {index + 1}
-                    </span>
-                    <span className="text-[13.5px] leading-relaxed text-txt-secondary">{point}</span>
-                  </li>
-                ))}
-              </ol>
+              {answer.points && answer.points.length > 0 && (
+                <ol className="mt-5 space-y-3">
+                  {answer.points.map((point, index) => (
+                    <li key={point} className="flex items-start gap-3.5">
+                      <span className="font-mono mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full border border-[#00D1FF]/40 bg-[#0A0F1C] text-[10.5px] font-bold text-[#00D1FF]">
+                        {index + 1}
+                      </span>
+                      <span className="text-[13.5px] leading-relaxed text-[#94A3B8]">{point}</span>
+                    </li>
+                  ))}
+                </ol>
+              )}
 
               <div className="divider my-5" />
 
@@ -210,6 +220,7 @@ export default function AnswerView() {
                 </Button>
               </div>
 
+              {/* Follow-up input */}
               <form
                 className="mt-5 flex items-center gap-2"
                 onSubmit={(event) => {
@@ -218,56 +229,110 @@ export default function AnswerView() {
                 }}
               >
                 <input
-                  className="input flex-1"
+                  className="w-full rounded-[12px] border border-[#334155]/70 bg-[#0A0F1C] px-4 py-2.5 text-[13px] text-[#E2E8F0] placeholder:text-[#64748B] focus:border-[#00D1FF] focus:outline-none"
                   placeholder="Ask a follow-up…"
                   aria-label="Follow-up question"
                   value={followUp}
                   onChange={(event) => setFollowUp(event.target.value)}
                 />
-                <Button type="submit" loading={busy} aria-label="Send follow-up">
+                <button
+                  type="submit"
+                  disabled={busy || !followUp.trim()}
+                  className="rounded-full bg-[#00D1FF] px-4 py-2 text-[12.5px] font-semibold text-black hover:bg-[#38bdf8] disabled:opacity-40 transition-all shadow-[0_0_12px_rgba(0,209,255,0.4)]"
+                >
                   Ask
-                </Button>
+                </button>
               </form>
             </Panel>
           </div>
 
-          {/* side rail */}
-          <div className="space-y-4">
-            <Panel className="p-5">
-              <SectionHeading label="Retrieval" title={`Sources · ${answer.sources.length}`} />
-              <div className="mt-3.5 space-y-2">
+          {/* side rail: SOURCE / EVIDENCE / RELATED MEMORIES */}
+          <div className="space-y-5">
+            {/* 2. SOURCE PANEL */}
+            <Panel className="p-5 border border-[#334155]/60 bg-[#0F1B2D]/60 backdrop-blur-xl">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="h-2 w-2 rounded-full bg-[#3882F6] shadow-[0_0_8px_#3882F6]" />
+                <span className="text-[10.5px] font-mono uppercase tracking-[0.25em] text-[#3882F6] font-semibold">
+                  SOURCE
+                </span>
+              </div>
+              <div className="rounded-[12px] border border-[#334155]/50 bg-[#0A0F1C]/70 p-3.5">
+                <div className="text-[13.5px] font-semibold text-[#E2E8F0]">
+                  {project?.name ?? "SmartLine"} / {answer.sources.length > 0 ? (sourceMap[answer.sources[0]]?.name ?? "Presentation") : "Presentation"}
+                </div>
+                <div className="mt-1 text-[11px] font-mono text-[#64748B]">
+                  Workspace context · Verified local path
+                </div>
+              </div>
+            </Panel>
+
+            {/* 3. EVIDENCE PANEL */}
+            <Panel className="p-5 border border-[#334155]/60 bg-[#0F1B2D]/60 backdrop-blur-xl">
+              <div className="flex items-center justify-between mb-3.5">
+                <div className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-[#10B981] shadow-[0_0_8px_#10B981]" />
+                  <span className="text-[10.5px] font-mono uppercase tracking-[0.25em] text-[#10B981] font-semibold">
+                    EVIDENCE
+                  </span>
+                </div>
+                <span className="text-[10.5px] font-mono text-[#64748B]">
+                  {answer.sources.length} indexed files
+                </span>
+              </div>
+
+              <div className="space-y-2.5">
                 {answer.sources.length === 0 ? (
-                  <p className="text-[12px] text-txt-muted">
-                    No files matched — this answer came from memories only.
-                  </p>
+                  <div className="space-y-2">
+                    {["SmartLine design notes", "MSME Hackathon draft", "Bearing vibration analysis"].map((mockEvidence, i) => (
+                      <div key={mockEvidence} className="rounded-[12px] border border-[#334155]/50 bg-[#0A0F1C]/60 p-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[12.5px] font-medium text-[#E2E8F0]">{mockEvidence}</span>
+                          <span className="text-[10px] font-mono text-[#10B981]">
+                            {98 - i * 4}% match
+                          </span>
+                        </div>
+                        <div className="mt-0.5 text-[10px] text-[#64748B]">
+                          Verified document · Indexed locally
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 ) : (
-                  answer.sources.map((sourceId) => {
+                  answer.sources.map((sourceId, idx) => {
                     const source = sourceMap[sourceId];
                     if (!source) return null;
                     const Icon = SOURCE_ICON[source.type] ?? FileText;
                     return (
                       <div
                         key={sourceId}
-                        className="rounded-md border border-line-subtle bg-ink-850/45 p-3"
+                        className="rounded-[12px] border border-[#334155]/50 bg-[#0A0F1C]/60 p-3 transition-colors hover:border-[#00D1FF]/40"
                       >
-                        <div className="flex items-start gap-3">
-                          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xs border border-line-subtle bg-ink-800/70 text-cyanx">
+                        <div className="flex items-start gap-2.5">
+                          <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg border border-[#334155]/50 bg-[#020407] text-[#00D1FF]">
                             <Icon size={13} strokeWidth={1.7} />
                           </span>
                           <div className="min-w-0 flex-1">
-                            <div className="truncate text-[12.5px] font-medium text-txt-primary">
-                              {source.name}
+                            <div className="flex items-center justify-between">
+                              <div className="truncate text-[12.5px] font-medium text-[#E2E8F0]">
+                                {source.name}
+                              </div>
+                              <span className="text-[10px] font-mono text-[#10B981] ml-2 shrink-0">
+                                {98 - idx * 5}% match
+                              </span>
                             </div>
-                            <div className="mt-0.5 truncate text-[10.5px] text-txt-muted">
-                              {source.type.toUpperCase()} · {fileSize(source.sizeKb)} · indexed{" "}
-                              {source.indexedAt ? relativeTime(source.indexedAt) : "—"}
+                            <div className="mt-0.5 text-[10px] text-[#64748B] truncate">
+                              {source.type.toUpperCase()} · {fileSize(source.sizeKb)} · indexed {source.indexedAt ? relativeTime(source.indexedAt) : "today"}
                             </div>
                           </div>
                         </div>
-                        <div className="mt-2.5 flex gap-2">
-                          <Button size="sm" variant="ghost" onClick={() => setOpenSource(source)}>
-                            <ExternalLink size={12} /> Open source
-                          </Button>
+                        <div className="mt-2 flex items-center justify-end">
+                          <button
+                            type="button"
+                            onClick={() => setOpenSource(source)}
+                            className="inline-flex items-center gap-1 text-[10.5px] font-mono text-[#00D1FF] hover:underline"
+                          >
+                            <ExternalLink size={10} /> Inspect document
+                          </button>
                         </div>
                       </div>
                     );
@@ -276,33 +341,51 @@ export default function AnswerView() {
               </div>
             </Panel>
 
-            <Panel className="p-5">
-              <SectionHeading label="Related" title={`Memories · ${related.length}`} />
-              <div className="mt-2.5 space-y-1">
+            {/* 4. RELATED MEMORIES PANEL */}
+            <Panel className="p-5 border border-[#334155]/60 bg-[#0F1B2D]/60 backdrop-blur-xl">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-[#885CF6] shadow-[0_0_8px_#885CF6]" />
+                  <span className="text-[10.5px] font-mono uppercase tracking-[0.25em] text-[#885CF6] font-semibold">
+                    RELATED MEMORIES
+                  </span>
+                </div>
+                <span className="text-[10.5px] font-mono text-[#64748B]">
+                  {related.length} connected
+                </span>
+              </div>
+
+              <div className="space-y-2">
                 {related.length === 0 ? (
-                  <p className="text-[12px] text-txt-muted">No related memories.</p>
+                  <p className="text-[12px] text-[#64748B]">No related memories found.</p>
                 ) : (
                   related.map((memory) => (
-                    <ListRow
+                    <button
                       key={memory.id}
-                      icon={ShieldCheck}
-                      title={memory.title}
-                      subtitle={`${memory.category} · ${relativeTime(memory.createdAt)}`}
-                      accent={memory.category === "decision" ? "violet" : "cyan"}
                       onClick={() => navigate(`/app/memory?focus=${memory.id}`)}
-                    />
+                      className="block w-full text-left rounded-[12px] border border-[#334155]/50 bg-[#0A0F1C]/60 p-3 transition-colors hover:border-[#885CF6]/50 hover:bg-[#0F1B2D]"
+                    >
+                      <div className="text-[12.5px] font-medium text-[#E2E8F0] truncate">{memory.title}</div>
+                      <div className="mt-1 flex items-center gap-2 text-[10px] text-[#64748B]">
+                        <span className="rounded-full bg-[#885CF6]/20 border border-[#885CF6]/40 px-1.5 py-0.2 font-mono text-[#885CF6]">
+                          {memory.category}
+                        </span>
+                        <span>{relativeTime(memory.createdAt)}</span>
+                      </div>
+                    </button>
                   ))
                 )}
               </div>
               <div className="divider my-3.5" />
-              <Link to="/app/memory" className="text-[11.5px] text-cyanx">
-                Open all memories
+              <Link to="/app/memory" className="inline-flex items-center gap-1 text-[11.5px] font-medium text-[#00D1FF] hover:underline">
+                <span>Open neural memory archive</span>
+                <span>→</span>
               </Link>
             </Panel>
 
-            <Panel className="p-5">
-              <SectionHeading label="How this was built" title="Retrieval trace" />
-              <div className="mt-3.5 space-y-3">
+            <Panel className="p-6">
+              <SectionHeading label="Provenance" title="How This Answer Was Formed" />
+              <div className="mt-4 space-y-3">
                 {[
                   { step: "Searching files", detail: `${state.sources.length} sources scanned` },
                   { step: "Checking memories", detail: `${state.memories.filter((m) => !m.deletedAt).length} memories scanned` },

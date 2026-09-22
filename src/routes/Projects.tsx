@@ -1,11 +1,21 @@
 /**
  * Projects — automatically organised by your work.
  *
- * Projects are plain local records: files, memories, tasks and conversations all
+ * Projects are intelligent workspaces: files, memories, tasks and conversations all
  * point at them, and every count on this screen is derived, never hardcoded.
  */
 
-import { ArrowUpRight, FolderKanban, Plus, Sparkles, Tag } from "lucide-react";
+import {
+  ArrowUpRight,
+  Clock,
+  FileText,
+  FolderKanban,
+  Layers,
+  Plus,
+  ShieldCheck,
+  Sparkles,
+  Tag,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MobileTopBar } from "../components/Chrome";
@@ -24,33 +34,33 @@ import { useBrain } from "../lib/store";
 import type { Project } from "../lib/types";
 
 const ACCENTS: Record<string, string> = {
-  cyan: "from-cyanx/24",
-  violet: "from-violetx/24",
-  amber: "from-amberx/22",
-  green: "from-greenx/22",
+  cyan: "from-cyanx/20 border-cyanx/30 text-cyanx",
+  violet: "from-purplex/20 border-purplex/30 text-purplex",
+  amber: "from-amberx/20 border-amberx/30 text-amberx",
+  green: "from-greenx/20 border-greenx/30 text-greenx",
 };
 
 function ProjectArt({ accent = "cyan" }: { accent?: Project["accent"] }) {
   return (
-    <div className="relative h-[132px] overflow-hidden rounded-lg border border-line-subtle">
-      <div className="absolute inset-0 bg-[radial-gradient(120%_120%_at_20%_0%,#0e222e_0%,#050c13_70%)]" />
-      <div className={`absolute inset-0 bg-gradient-to-br ${ACCENTS[accent]} to-transparent`} />
-      <svg viewBox="0 0 320 132" className="absolute inset-0 h-full w-full" aria-hidden="true">
+    <div className="relative h-[110px] overflow-hidden rounded-xl border border-border/80 bg-space/90">
+      <div className="absolute inset-0 bg-[radial-gradient(120%_120%_at_20%_0%,#0F1B2D_0%,#020407_80%)]" />
+      <div className={`absolute inset-0 bg-gradient-to-br ${ACCENTS[accent]} to-transparent opacity-40`} />
+      <svg viewBox="0 0 320 110" className="absolute inset-0 h-full w-full opacity-60" aria-hidden="true">
         <defs>
           <linearGradient id={`art-${accent}`} x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="rgba(0,217,255,0.65)" />
-            <stop offset="100%" stopColor="rgba(141,108,255,0.25)" />
+            <stop offset="0%" stopColor="#00D1FF" stopOpacity="0.6" />
+            <stop offset="100%" stopColor="#885CF6" stopOpacity="0.2" />
           </linearGradient>
         </defs>
-        <ellipse cx="160" cy="96" rx="120" ry="22" fill="none" stroke={`url(#art-${accent})`} strokeWidth="0.8" />
-        <ellipse cx="160" cy="96" rx="78" ry="14" fill="none" stroke="rgba(145,205,235,0.22)" strokeWidth="0.7" />
-        <circle cx="160" cy="96" r="26" fill="rgba(4,9,14,0.6)" stroke="rgba(0,217,255,0.35)" strokeWidth="0.9" />
-        <circle cx="160" cy="96" r="9" fill="rgba(0,217,255,0.22)" />
-        <rect x="24" y="18" width="46" height="34" rx="6" fill="rgba(11,26,36,0.9)" stroke="rgba(145,205,235,0.18)" />
-        <rect x="250" y="26" width="46" height="34" rx="6" fill="rgba(11,26,36,0.9)" stroke="rgba(145,205,235,0.18)" />
-        <path d="M70 35 H250" stroke="rgba(0,217,255,0.24)" strokeWidth="0.7" strokeDasharray="3 4" />
+        <ellipse cx="160" cy="80" rx="110" ry="18" fill="none" stroke={`url(#art-${accent})`} strokeWidth="0.8" />
+        <ellipse cx="160" cy="80" rx="65" ry="11" fill="none" stroke="rgba(0,209,255,0.25)" strokeWidth="0.7" />
+        <circle cx="160" cy="80" r="18" fill="rgba(2,4,7,0.8)" stroke="#00D1FF" strokeWidth="0.9" />
+        <circle cx="160" cy="80" r="5" fill="#00D1FF" className="animate-pulse" />
+        <rect x="30" y="16" width="36" height="26" rx="6" fill="rgba(15,27,45,0.8)" stroke="rgba(51,65,85,0.8)" />
+        <rect x="254" y="20" width="36" height="26" rx="6" fill="rgba(15,27,45,0.8)" stroke="rgba(51,65,85,0.8)" />
+        <path d="M66 29 H254" stroke="rgba(0,209,255,0.2)" strokeWidth="0.7" strokeDasharray="3 3" />
       </svg>
-      <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-ink-900/95 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-panel/90 to-transparent" />
     </div>
   );
 }
@@ -68,13 +78,16 @@ export default function ProjectsPage() {
     files: state.sources.filter((source) => source.projectId === projectId).length,
     memories: state.memories.filter((memory) => !memory.deletedAt && memory.projectId === projectId).length,
     tasks: state.tasks.filter((task) => task.projectId === projectId && task.status !== "done").length,
+    decisions: state.memories.filter(
+      (memory) => !memory.deletedAt && memory.projectId === projectId && memory.category === "decision",
+    ).length,
   });
 
   const handleCreate = () => {
     if (!draft.name.trim()) return;
     const project = createProject({
       name: draft.name.trim(),
-      description: draft.description.trim() || "New workspace",
+      description: draft.description.trim() || "Intelligent Workspace",
       tags: draft.tags
         .split(",")
         .map((tag) => tag.trim())
@@ -101,20 +114,25 @@ export default function ProjectsPage() {
         {isDesktop ? (
           <header className="mb-6 flex items-end justify-between gap-5">
             <div>
-              <TechLabel tone="cyan">Projects</TechLabel>
+              <TechLabel tone="cyan">Intelligent Workspaces</TechLabel>
               <h1 className="mt-2 title-xl">Automatically organized by your work.</h1>
-              <p className="mt-2 text-[13px] text-txt-secondary">
-                Files, memories, tasks and conversations grouped into the things you actually build.
+              <p className="mt-2 text-[13.5px] text-txt-secondary">
+                Files, memories, tasks, and conversations automatically grouped into the missions you actually build.
               </p>
             </div>
             <Button variant="primary" icon={Plus} onClick={() => setCreating(true)}>
-              New project
+              New Workspace
             </Button>
           </header>
         ) : (
           <div className="mb-4 flex items-center justify-between">
-            <TechLabel>Active projects · {projects.length}</TechLabel>
-            <button type="button" className="icon-btn h-9 w-9" aria-label="New project" onClick={() => setCreating(true)}>
+            <TechLabel>Active Workspaces · {projects.length}</TechLabel>
+            <button
+              type="button"
+              className="icon-btn h-9 w-9 border-border bg-surface text-cyanx"
+              aria-label="New project"
+              onClick={() => setCreating(true)}
+            >
               <Plus size={16} />
             </button>
           </div>
@@ -124,15 +142,15 @@ export default function ProjectsPage() {
           <StateBlock
             kind="empty"
             title="No projects yet"
-            description="Create a project and NeoBrain will start linking files and memories to it."
+            description="Create a project workspace and NeoBrain will start linking files, conversations, and memories to it."
             action={
               <Button variant="primary" onClick={() => setCreating(true)}>
-                <Plus size={15} /> Create project
+                <Plus size={15} /> Create Workspace
               </Button>
             }
           />
         ) : (
-          <div className={`grid gap-4 ${isDesktop ? "sm:grid-cols-2 xl:grid-cols-3" : ""}`}>
+          <div className={`grid gap-5 ${isDesktop ? "sm:grid-cols-2 xl:grid-cols-3" : ""}`}>
             {projects.map((project) => {
               const counts = stats(project.id);
               return (
@@ -140,40 +158,54 @@ export default function ProjectsPage() {
                   key={project.id}
                   type="button"
                   onClick={() => navigate(`/app/projects/${project.id}`)}
-                  className="group panel overflow-hidden p-3.5 text-left transition-all duration-400 ease-premium hover:border-line-soft hover:shadow-elevated active:scale-[0.995]"
+                  className="group relative overflow-hidden rounded-2xl border border-border bg-gradient-to-b from-surface/80 via-panel/50 to-space/90 p-4.5 text-left transition-all duration-300 ease-premium hover:border-cyanx/40 hover:shadow-[0_0_24px_rgba(0,209,255,0.08)] active:scale-[0.995]"
                 >
                   <ProjectArt accent={project.accent} />
-                  <div className="mt-3.5">
+                  <div className="mt-4">
                     <div className="flex items-center justify-between gap-3">
-                      <h2 className="text-[15.5px] font-semibold text-txt-primary">{project.name}</h2>
+                      <h2 className="text-[16px] font-semibold text-txt-primary tracking-tight">{project.name}</h2>
                       <ArrowUpRight
-                        size={15}
+                        size={16}
                         className="shrink-0 text-txt-muted transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-cyanx"
                       />
                     </div>
-                    <p className="mt-1.5 line-clamp-2 text-[12px] leading-relaxed text-txt-secondary">
+                    <p className="mt-1.5 line-clamp-2 text-[12.5px] leading-relaxed text-txt-secondary">
                       {project.description}
                     </p>
-                    <div className="mt-3 flex flex-wrap items-center gap-x-3.5 gap-y-1.5 text-[11px] text-txt-muted">
-                      <span className="flex items-center gap-1.5">
-                        <FolderKanban size={11} /> {counts.files} files
-                      </span>
-                      <span className="flex items-center gap-1.5">
-                        <Sparkles size={11} /> {counts.memories} memories
-                      </span>
-                      <span className="flex items-center gap-1.5">
-                        <Tag size={11} /> {counts.tasks} tasks
-                      </span>
+
+                    {/* Level 3 Micro-Module telemetry badges */}
+                    <div className="mt-4 grid grid-cols-3 gap-2">
+                      <div className="rounded-lg border border-border/80 bg-space/60 p-2 text-center">
+                        <div className="font-mono text-[14px] font-semibold text-txt-primary">{counts.files}</div>
+                        <div className="text-[10px] font-mono uppercase text-txt-muted">Files</div>
+                      </div>
+                      <div className="rounded-lg border border-border/80 bg-space/60 p-2 text-center">
+                        <div className="font-mono text-[14px] font-semibold text-cyanx">{counts.memories}</div>
+                        <div className="text-[10px] font-mono uppercase text-txt-muted">Memories</div>
+                      </div>
+                      <div className="rounded-lg border border-border/80 bg-space/60 p-2 text-center">
+                        <div className="font-mono text-[14px] font-semibold text-amberx">{counts.tasks}</div>
+                        <div className="text-[10px] font-mono uppercase text-txt-muted">Tasks</div>
+                      </div>
                     </div>
-                    <div className="mt-3 flex flex-wrap gap-1.5">
+
+                    <div className="mt-3.5 flex flex-wrap gap-1.5">
                       {project.tags.map((tag) => (
-                        <Chip key={tag} as="span">
+                        <span key={tag} className="micro-module text-[10.5px]">
                           {tag}
-                        </Chip>
+                        </span>
                       ))}
                     </div>
-                    <div className="mt-3.5 text-[10.5px] text-txt-muted">
-                      Last activity {relativeTime(project.updatedAt)}
+
+                    <div className="mt-4 pt-3 border-t border-border/60 flex items-center justify-between text-[11px] font-mono text-txt-muted">
+                      <span className="flex items-center gap-1">
+                        <Clock size={11} /> {relativeTime(project.updatedAt)}
+                      </span>
+                      {counts.decisions > 0 ? (
+                        <span className="text-purplex flex items-center gap-1">
+                          <ShieldCheck size={11} /> {counts.decisions} decisions
+                        </span>
+                      ) : null}
                     </div>
                   </div>
                 </button>
@@ -183,27 +215,28 @@ export default function ProjectsPage() {
         )}
 
         {isDesktop ? (
-          <Panel className="mt-6 p-5">
-            <SectionHeading label="Tip" title="Projects link everything" />
-            <p className="mt-2 max-w-[70ch] text-[12.5px] leading-relaxed text-txt-secondary">
-              Anything captured while a project is in context is filed against it: answers, memories,
-              indexed files and detected tasks. Open a project to see its timeline and current state.
+          <Panel className="mt-6 p-6">
+            <SectionHeading label="Intelligent Linkage" title="How Workspace Clustering Works" />
+            <p className="mt-2 max-w-[76ch] text-[13px] leading-relaxed text-txt-secondary">
+              Anything captured while a project is active in your mind is indexed against it: answers, conversation records,
+              source documents, and detected action items. Switch contexts instantly with full provenance and continuous memory.
             </p>
           </Panel>
         ) : null}
       </div>
 
+      {/* New Project Sheet */}
       <Sheet
         open={creating}
         onClose={() => setCreating(false)}
-        title="New project"
+        title="New Workspace"
         footer={
           <>
             <Button variant="ghost" onClick={() => setCreating(false)}>
               Cancel
             </Button>
             <Button variant="primary" onClick={handleCreate} disabled={!draft.name.trim()}>
-              Create project
+              Create Workspace
             </Button>
           </>
         }
@@ -211,25 +244,25 @@ export default function ProjectsPage() {
         <div className="space-y-4">
           <div>
             <label htmlFor="project-name" className="label mb-2 block">
-              Name
+              Workspace Name
             </label>
             <input
               id="project-name"
-              className="input"
-              placeholder="e.g. SmartLine"
+              className="input bg-surface border-border"
+              placeholder="e.g. SmartLine / Orbit Core"
               value={draft.name}
               onChange={(event) => setDraft({ ...draft, name: event.target.value })}
             />
           </div>
           <div>
             <label htmlFor="project-description" className="label mb-2 block">
-              Description
+              Objective & Scope
             </label>
             <textarea
               id="project-description"
-              className="input h-auto resize-none py-3 leading-relaxed"
+              className="input h-auto resize-none py-3 leading-relaxed bg-surface border-border"
               rows={3}
-              placeholder="What is this project about?"
+              placeholder="What are you creating or exploring in this workspace?"
               value={draft.description}
               onChange={(event) => setDraft({ ...draft, description: event.target.value })}
             />
@@ -240,8 +273,8 @@ export default function ProjectsPage() {
             </label>
             <input
               id="project-tags"
-              className="input"
-              placeholder="ML, Hardware"
+              className="input bg-surface border-border"
+              placeholder="AI, Hardware, Research"
               value={draft.tags}
               onChange={(event) => setDraft({ ...draft, tags: event.target.value })}
             />

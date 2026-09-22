@@ -123,43 +123,57 @@ function ParticleField({ intensity, density }: { intensity: number; density: num
 function AmbientBase({ intensity = 1, particles = true, grid = true, variant = "app" }: Props) {
   const reduced = useReducedMotionPreference();
 
-  const auraTop = variant === "voice" ? "rgba(196,123,255,0.30)" : "rgba(0,217,255,0.24)";
-  const auraBottom = variant === "marketing" ? "rgba(255,154,87,0.14)" : "rgba(36,123,255,0.22)";
+  const auraTop = variant === "voice" ? "rgba(136,92,246,0.22)" : "rgba(0,209,255,0.18)";
+  const auraBottom = variant === "marketing" ? "rgba(245,158,11,0.12)" : "rgba(56,130,246,0.16)";
 
   return (
     <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden" aria-hidden="true">
-      <div className="absolute inset-0 bg-ink-900" />
+      {/* 1. Deep Space Base #020407 */}
+      <div className="absolute inset-0 bg-[#020407]" />
+
+      {/* 2. Atmospheric computation gradient */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(120% 80% at 50% -10%, #0a1a26 0%, #050c13 55%, #04090e 100%)",
+            "radial-gradient(130% 90% at 75% 15%, #0d1e33 0%, #081220 35%, #050b14 70%, #020407 100%)",
         }}
       />
+
+      {/* 3. Celestial Orbital Horizon Arc (as seen in reference mockup) */}
+      <div className="absolute -top-[18%] -right-[8%] h-[680px] w-[950px] overflow-hidden opacity-40">
+        <div
+          className="absolute inset-0 rounded-[100%] border-t border-[#00D1FF]/40 shadow-[0_-10px_50px_rgba(0,209,255,0.25)]"
+          style={{
+            background:
+              "radial-gradient(ellipse 70% 35% at 50% 0%, rgba(0, 209, 255, 0.12) 0%, rgba(56, 130, 246, 0.05) 50%, transparent 80%)",
+          }}
+        />
+      </div>
+
+      {/* 4. Soft cyan and blue atmospheric light pools */}
       <div
-        className="absolute -top-[26%] left-1/2 h-[70vh] w-[92vw] -translate-x-1/2 rounded-full blur-[110px]"
-        style={{ background: `radial-gradient(circle, ${auraTop} 0%, rgba(0,0,0,0) 68%)`, opacity: 0.85 * intensity }}
+        className="absolute -top-[20%] left-1/3 h-[60vh] w-[70vw] -translate-x-1/2 rounded-full blur-[140px]"
+        style={{ background: `radial-gradient(circle, ${auraTop} 0%, rgba(0,0,0,0) 70%)`, opacity: 0.85 * intensity }}
       />
       <div
-        className="absolute -bottom-[30%] right-[-14%] h-[64vh] w-[76vw] rounded-full blur-[130px]"
-        style={{ background: `radial-gradient(circle, ${auraBottom} 0%, rgba(0,0,0,0) 70%)`, opacity: 0.7 * intensity }}
+        className="absolute bottom-[-20%] right-[-10%] h-[55vh] w-[65vw] rounded-full blur-[150px]"
+        style={{ background: `radial-gradient(circle, ${auraBottom} 0%, rgba(0,0,0,0) 70%)`, opacity: 0.75 * intensity }}
       />
       <div
-        className="absolute -left-[18%] bottom-[-8%] h-[42vh] w-[52vw] rounded-full blur-[120px]"
-        style={{ background: `radial-gradient(circle, rgba(141,108,255,0.18) 0%, rgba(0,0,0,0) 72%)`, opacity: 0.6 * intensity }}
+        className="absolute -left-[15%] bottom-[10%] h-[40vh] w-[45vw] rounded-full blur-[130px]"
+        style={{ background: `radial-gradient(circle, rgba(136,92,246,0.12) 0%, rgba(0,0,0,0) 70%)`, opacity: 0.5 * intensity }}
       />
+
+      {/* 5. Subtle technical grid */}
       {grid ? (
-        <div className="tech-grid absolute inset-0 opacity-[0.5] [mask-image:radial-gradient(120%_80%_at_50%_20%,#000_0%,transparent_78%)]" />
+        <div className="tech-grid absolute inset-0 opacity-[0.35] [mask-image:radial-gradient(120%_80%_at_60%_30%,#000_0%,transparent_80%)]" />
       ) : null}
-      <div
-        className="absolute inset-0 opacity-[0.035] mix-blend-overlay"
-        style={{
-          backgroundImage:
-            "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E\")",
-        }}
-      />
-      {particles && !reduced ? <ParticleField intensity={intensity} density={variant === "marketing" ? 1.5 : 1} /> : null}
-      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-ink-900 to-transparent" />
+
+      {/* 6. Sparse drifting particles */}
+      {particles && !reduced ? <ParticleField intensity={intensity} density={variant === "marketing" ? 1.2 : 0.8} /> : null}
+
+      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#020407] to-transparent" />
     </div>
   );
 }

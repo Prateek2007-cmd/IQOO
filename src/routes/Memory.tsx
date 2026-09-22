@@ -10,8 +10,11 @@ import {
   Archive,
   Check,
   CheckSquare,
+  Clock,
   FileText,
   Filter,
+  FolderKanban,
+  Lightbulb,
   Pencil,
   Pin,
   Plus,
@@ -21,6 +24,7 @@ import {
   Sparkles,
   Star,
   Trash2,
+  Users,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -41,7 +45,7 @@ import { useIsDesktop } from "../lib/hooks";
 import { useBrain } from "../lib/store";
 import type { Importance, Memory, RetentionType } from "../lib/types";
 
-type TabId = "all" | "important" | "decisions" | "tasks" | "notes";
+type TabId = "all" | "people" | "projects" | "ideas" | "decisions" | "tasks";
 
 export default function MemoryPage() {
   const isDesktop = useIsDesktop();
@@ -72,25 +76,32 @@ export default function MemoryPage() {
     if (focus) setOpenId(focus);
   }, [params]);
 
+  const activeMemories = useMemo(() => state.memories.filter((m) => !m.deletedAt), [state.memories]);
+
   const memories = useMemo(() => {
-    const base = state.memories.filter((memory) => !memory.deletedAt);
+    const base = activeMemories;
     const byTab =
       tab === "all"
         ? base
-        : tab === "important"
-          ? base.filter((memory) => memory.importance === "important" || memory.importance === "structured")
-          : tab === "decisions"
-            ? base.filter((memory) => memory.category === "decision")
-            : tab === "tasks"
-              ? base.filter((memory) => memory.category === "task")
-              : base.filter((memory) => memory.category === "note" || memory.category === "knowledge");
-    const byProject = projectFilter === "all" ? byTab : byTab.filter((memory) => memory.projectId === projectFilter);
+        : tab === "people"
+          ? base.filter(
+              (m) =>
+                m.category === "conversation" ||
+                /sarah|marcus|elena|david|alex|chen|team|client|advisor|founder/i.test(`${m.title} ${m.content}`),
+            )
+          : tab === "projects"
+            ? base.filter((m) => Boolean(m.projectId))
+            : tab === "ideas"
+              ? base.filter((m) => m.category === "knowledge" || m.category === "note")
+              : tab === "decisions"
+                ? base.filter((m) => m.category === "decision")
+                : base.filter((m) => m.category === "task");
+
+    const byProject = projectFilter === "all" ? byTab : byTab.filter((m) => m.projectId === projectFilter);
     if (!query.trim()) return byProject;
     const needle = query.trim().toLowerCase();
-    return byProject.filter((memory) =>
-      `${memory.title} ${memory.content}`.toLowerCase().includes(needle),
-    );
-  }, [state.memories, tab, projectFilter, query]);
+    return byProject.filter((m) => `${m.title} ${m.content}`.toLowerCase().includes(needle));
+  }, [activeMemories, tab, projectFilter, query]);
 
   const open = state.memories.find((memory) => memory.id === openId) ?? null;
   const archived = state.memories.filter((memory) => memory.deletedAt);
@@ -134,11 +145,12 @@ export default function MemoryPage() {
         {isDesktop ? (
           <header className="mb-6 flex items-end justify-between gap-5">
             <div>
-              <TechLabel tone="cyan">Memory</TechLabel>
+              <TechLabel tone="cyan">Memory Space</TechLabel>
               <h1 className="mt-2 title-xl">Things that matter to you.</h1>
               <p className="mt-2 text-[13px] text-txt-secondary">
-                {state.memories.filter((memory) => !memory.deletedAt).length} memories ·{" "}
-                {state.memories.filter((memory) => memory.status === "candidate").length} awaiting review
+                {activeMemories.length} memories retained ·{" "}
+                {activeMemories.filter((m) => m.importance === "important" || m.importance === "structured").length} high-priority beacons ·{" "}
+                {activeMemories.filter((m) => m.status === "candidate").length} awaiting review
               </p>
             </div>
             <Button variant="primary" icon={Plus} onClick={() => setCreating(true)}>
@@ -155,15 +167,15 @@ export default function MemoryPage() {
               <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                className="input pl-10"
-                placeholder="Search memories…"
+                className="input pl-10 bg-surface/70 border-border"
+                placeholder="Search memories across time…"
                 aria-label="Search memories"
               />
             </div>
             {!isDesktop ? (
               <button
                 type="button"
-                className="icon-btn h-[46px] w-[46px]"
+                className="icon-btn h-[46px] w-[46px] border-border bg-surface text-cyanx"
                 aria-label="New memory"
                 onClick={() => setCreating(true)}
               >
@@ -174,19 +186,44 @@ export default function MemoryPage() {
 
           <Tabs
             tabs={[
-              { id: "all", label: "All", count: state.memories.filter((m) => !m.deletedAt).length },
-              { id: "important", label: "Important" },
-              { id: "decisions", label: "Decisions" },
-              { id: "tasks", label: "Tasks", count: openTasks.length },
-              { id: "notes", label: "Notes" },
+              { id: "all", label: "ALL", count: activeMemories.length },
+              {
+                id: "people",
+                label: "PEOPLE",
+                count: activeMemories.filter(
+                  (m) =>
+                    m.category === "conversation" ||
+                    /sarah|marcus|elena|david|alex|chen|team|client|advisor|founder/i.test(`${m.title} ${m.content}`),
+                ).length,
+              },
+              {
+                id: "projects",
+                label: "PROJECTS",
+                count: activeMemories.filter((m) => Boolean(m.projectId)).length,
+              },
+              {
+                id: "ideas",
+                label: "IDEAS",
+                count: activeMemories.filter((m) => m.category === "knowledge" || m.category === "note").length,
+              },
+              {
+                id: "decisions",
+                label: "DECISIONS",
+                count: activeMemories.filter((m) => m.category === "decision").length,
+              },
+              {
+                id: "tasks",
+                label: "TASKS",
+                count: openTasks.length,
+              },
             ]}
             value={tab}
-            onChange={setTab}
+            onChange={(val) => setTab(val as TabId)}
           />
 
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="flex items-center gap-1.5 text-[10.5px] text-txt-muted">
-              <Filter size={12} /> Project
+          <div className="flex flex-wrap items-center gap-2 pt-1">
+            <span className="flex items-center gap-1.5 text-[10.5px] uppercase tracking-wider text-txt-muted font-mono">
+              <Filter size={11} className="text-cyanx" /> Project Scope:
             </span>
             <Chip active={projectFilter === "all"} onClick={() => setProjectFilter("all")}>
               All
@@ -203,7 +240,8 @@ export default function MemoryPage() {
           </div>
         </div>
 
-        <div className="mt-5 grid gap-5 lg:grid-cols-[1.4fr_0.8fr]">
+        <div className="mt-6 grid gap-6 lg:grid-cols-[1.4fr_0.8fr]">
+          {/* Main timeline column */}
           <div>
             {memories.length === 0 ? (
               <StateBlock
@@ -215,7 +253,7 @@ export default function MemoryPage() {
                 }
                 description={
                   query || projectFilter !== "all" || tab !== "all"
-                    ? "Clear the search or pick a different tab or project."
+                    ? "Clear the search or pick a different category tab."
                     : "Captures you accept — decisions, tasks and knowledge — collect here."
                 }
                 action={
@@ -239,69 +277,151 @@ export default function MemoryPage() {
                 }
               />
             ) : (
-              <div className="space-y-2.5">
-                {memories.map((memory) => {
-                  const project = state.projects.find((item) => item.id === memory.projectId);
-                  return (
-                    <button
-                      key={memory.id}
-                      type="button"
-                      onClick={() => setOpenId(memory.id)}
-                      className="group flex w-full items-start gap-3.5 rounded-lg border border-line-subtle bg-[linear-gradient(180deg,rgba(16,42,55,0.36)_0%,rgba(7,16,25,0.6)_100%)] p-3.5 text-left transition-all duration-300 ease-premium hover:border-line-soft hover:shadow-panel active:scale-[0.995]"
-                    >
-                      <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-xs border border-line-subtle bg-ink-800/70">
-                        {memory.category === "decision" ? (
-                          <ShieldCheck size={14} className="text-violetx" />
-                        ) : memory.category === "task" ? (
-                          <CheckSquare size={14} className="text-amberx" />
-                        ) : (
-                          <Sparkles size={14} className="text-cyanx" />
-                        )}
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="flex items-start gap-2">
-                          <span className="min-w-0 flex-1 text-[13.5px] font-medium leading-snug text-txt-primary">
-                            {memory.title}
-                          </span>
-                          {memory.importance === "important" || memory.importance === "structured" ? (
-                            <Star size={13} className="mt-0.5 shrink-0 text-amberx" />
-                          ) : null}
-                        </span>
-                        <span className="mt-1 line-clamp-2 block text-[12px] leading-relaxed text-txt-secondary">
-                          {memory.content}
-                        </span>
-                        <span className="mt-2 flex flex-wrap items-center gap-2">
-                          <Chip as="span">{memory.category}</Chip>
-                          {project ? <Chip as="span">{project.name}</Chip> : null}
-                          {memory.status === "candidate" ? <Chip as="span" active>needs review</Chip> : null}
-                          <span className="text-[10.5px] text-txt-muted">{shortDate(memory.createdAt)}</span>
-                        </span>
-                      </span>
-                    </button>
-                  );
-                })}
+              <div className="relative pl-6 sm:pl-8">
+                {/* Continuous vertical timeline connector line */}
+                <div
+                  className="pointer-events-none absolute left-[11px] sm:left-[15px] top-4 bottom-4 w-px bg-gradient-to-b from-cyanx/50 via-border/80 to-transparent"
+                  aria-hidden="true"
+                />
+
+                <div className="space-y-4">
+                  {memories.map((memory) => {
+                    const project = state.projects.find((item) => item.id === memory.projectId);
+                    const isImportant =
+                      memory.importance === "important" || memory.importance === "structured";
+                    const isDecision = memory.category === "decision";
+                    const isTask = memory.category === "task";
+
+                    return (
+                      <div key={memory.id} className="relative group">
+                        {/* Timeline Node Orb */}
+                        <div
+                          className={`absolute -left-[19px] sm:-left-[23px] top-5 h-[17px] w-[17px] rounded-full border transition-all duration-300 ${
+                            isImportant
+                              ? "border-cyanx bg-space shadow-[0_0_12px_rgba(0,209,255,0.7)]"
+                              : "border-border bg-space group-hover:border-line-soft"
+                          }`}
+                        >
+                          <div
+                            className={`h-full w-full rounded-full ${
+                              isImportant
+                                ? "bg-cyanx scale-[0.45] animate-pulse"
+                                : "bg-txt-muted/30 scale-[0.35] group-hover:bg-cyanx/60"
+                            }`}
+                          />
+                        </div>
+
+                        {/* Memory Panel */}
+                        <button
+                          type="button"
+                          onClick={() => setOpenId(memory.id)}
+                          className={`w-full text-left rounded-2xl border p-4.5 transition-all duration-300 ease-premium ${
+                            isImportant
+                              ? "border-cyanx/35 bg-gradient-to-b from-[#0F1B2D]/90 to-[#0A0F1C]/90 shadow-[0_0_24px_rgba(0,209,255,0.07)] hover:border-cyanx/60 hover:shadow-[0_0_30px_rgba(0,209,255,0.14)]"
+                              : "border-border bg-gradient-to-b from-surface/70 to-space/80 hover:border-line-soft hover:bg-surface/90"
+                          } active:scale-[0.995]`}
+                        >
+                          <div className="flex items-start gap-3.5">
+                            <span
+                              className={`mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-lg border ${
+                                isDecision
+                                  ? "border-purplex/30 bg-purplex/10 text-purplex"
+                                  : isTask
+                                    ? "border-amberx/30 bg-amberx/10 text-amberx"
+                                    : isImportant
+                                      ? "border-cyanx/30 bg-cyanx/10 text-cyanx shadow-[0_0_10px_rgba(0,209,255,0.2)]"
+                                      : "border-border bg-panel/60 text-txt-secondary"
+                              }`}
+                            >
+                              {isDecision ? (
+                                <ShieldCheck size={16} />
+                              ) : isTask ? (
+                                <CheckSquare size={16} />
+                              ) : memory.category === "conversation" ? (
+                                <Users size={16} />
+                              ) : (
+                                <Sparkles size={16} />
+                              )}
+                            </span>
+
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-start justify-between gap-2">
+                                <span
+                                  className={`text-[14px] font-semibold leading-snug ${
+                                    isImportant ? "text-txt-primary font-medium" : "text-txt-primary/95"
+                                  }`}
+                                >
+                                  {memory.title}
+                                </span>
+                                <div className="flex items-center gap-1.5 shrink-0">
+                                  {isImportant ? (
+                                    <span className="flex items-center gap-1 rounded-full border border-amberx/30 bg-amberx/10 px-2 py-0.5 text-[10px] font-mono uppercase text-amberx">
+                                      <Star size={10} className="fill-amberx text-amberx" /> Beacon
+                                    </span>
+                                  ) : null}
+                                </div>
+                              </div>
+
+                              <p className="mt-1.5 line-clamp-2 text-[12.5px] leading-relaxed text-txt-secondary">
+                                {memory.content}
+                              </p>
+
+                              {/* Level 3 Micro-Modules */}
+                              <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px]">
+                                <span className="micro-module capitalize text-cyanx">
+                                  {memory.category}
+                                </span>
+                                {project ? (
+                                  <span className="micro-module text-bluex">
+                                    <FolderKanban size={10} className="inline mr-1 -mt-0.5" />
+                                    {project.name}
+                                  </span>
+                                ) : null}
+                                {memory.sourceReferences.length > 0 ? (
+                                  <span className="micro-module text-txt-secondary">
+                                    <FileText size={10} className="inline mr-1 -mt-0.5" />
+                                    {memory.sourceReferences.length} sources
+                                  </span>
+                                ) : null}
+                                {memory.status === "candidate" ? (
+                                  <span className="micro-module border-amberx/40 text-amberx bg-amberx/10">
+                                    Needs review
+                                  </span>
+                                ) : null}
+                                <span className="ml-auto font-mono text-[10.5px] text-txt-muted flex items-center gap-1">
+                                  <Clock size={10} />
+                                  {shortDate(memory.createdAt)}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
           </div>
 
-          {/* side rail */}
+          {/* Side rail column */}
           <div className="space-y-4">
             {tab === "tasks" ? (
               <Panel className="p-5">
                 <SectionHeading label="Tasks" title={`${openTasks.length} open`} />
                 <div className="mt-3 space-y-2">
                   {state.tasks.map((task) => (
-                    <div key={task.id} className="flex items-start gap-3 rounded-md border border-line-subtle bg-ink-850/40 p-3">
+                    <div key={task.id} className="flex items-start gap-3 rounded-xl border border-border bg-panel/50 p-3">
                       <button
                         type="button"
                         onClick={() =>
                           updateTask(task.id, { status: task.status === "done" ? "open" : "done" })
                         }
                         className={[
-                          "mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-xs border transition-colors",
+                          "mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-md border transition-colors",
                           task.status === "done"
                             ? "border-greenx/50 bg-greenx/15 text-greenx"
-                            : "border-line-soft text-transparent hover:border-cyanx/50",
+                            : "border-border text-transparent hover:border-cyanx/50",
                         ].join(" ")}
                         aria-label={task.status === "done" ? "Mark as open" : "Mark as done"}
                       >
@@ -309,14 +429,16 @@ export default function MemoryPage() {
                       </button>
                       <div className="min-w-0 flex-1">
                         <div
-                          className={`text-[12.5px] ${task.status === "done" ? "text-txt-muted line-through" : "text-txt-primary"}`}
+                          className={`text-[12.5px] ${
+                            task.status === "done" ? "text-txt-muted line-through" : "text-txt-primary font-medium"
+                          }`}
                         >
                           {task.title}
                         </div>
-                        <div className="mt-1 flex flex-wrap items-center gap-2">
-                          <Chip as="span">{task.priority}</Chip>
+                        <div className="mt-1.5 flex flex-wrap items-center gap-2">
+                          <span className="micro-module uppercase">{task.priority}</span>
                           {task.dueDate ? (
-                            <span className="text-[10.5px] text-txt-muted">
+                            <span className="text-[10.5px] font-mono text-txt-muted">
                               due {shortDate(task.dueDate)} {new Date(task.dueDate) < new Date() ? "· overdue" : ""}
                             </span>
                           ) : null}
@@ -328,9 +450,10 @@ export default function MemoryPage() {
               </Panel>
             ) : null}
 
+            {/* Waiting for review panel */}
             <Panel className="p-5">
               <SectionHeading label="Review" title="Waiting for you" />
-              <div className="mt-3 space-y-1.5">
+              <div className="mt-3 space-y-2">
                 {state.memories.filter((memory) => memory.status === "candidate").length === 0 ? (
                   <p className="text-[12px] text-txt-muted">Nothing needs a decision right now.</p>
                 ) : (
@@ -350,16 +473,44 @@ export default function MemoryPage() {
               </div>
             </Panel>
 
+            {/* Telemetry overview */}
+            <Panel className="p-5">
+              <SectionHeading label="Telemetry" title="Memory Topology" />
+              <div className="mt-3.5 space-y-2.5 font-mono text-[11.5px]">
+                <div className="flex items-center justify-between border-b border-border/50 pb-2">
+                  <span className="text-txt-muted">TOTAL STORED</span>
+                  <span className="text-cyanx">{activeMemories.length}</span>
+                </div>
+                <div className="flex items-center justify-between border-b border-border/50 pb-2">
+                  <span className="text-txt-muted">DECISIONS RECORDED</span>
+                  <span className="text-purplex">
+                    {activeMemories.filter((m) => m.category === "decision").length}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between border-b border-border/50 pb-2">
+                  <span className="text-txt-muted">KNOWLEDGE & NOTES</span>
+                  <span className="text-bluex">
+                    {activeMemories.filter((m) => m.category === "knowledge" || m.category === "note").length}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-txt-muted">RETENTION EXPIRATION</span>
+                  <span className="text-txt-secondary">30-day default</span>
+                </div>
+              </div>
+            </Panel>
+
+            {/* Archived drawer */}
             <Panel className="p-5">
               <SectionHeading label="Archived" title={`${archived.length} removed`} />
-              <div className="mt-3 space-y-1.5">
+              <div className="mt-3 space-y-2">
                 {archived.length === 0 ? (
                   <p className="text-[12px] text-txt-muted">
                     Deleted memories land here first so you can restore them.
                   </p>
                 ) : (
                   archived.map((memory) => (
-                    <div key={memory.id} className="flex items-center gap-3 rounded-md border border-line-subtle bg-ink-850/40 p-3">
+                    <div key={memory.id} className="flex items-center gap-3 rounded-xl border border-border bg-panel/40 p-3">
                       <Archive size={13} className="shrink-0 text-txt-muted" />
                       <div className="min-w-0 flex-1">
                         <div className="truncate text-[12.5px] text-txt-secondary">{memory.title}</div>
@@ -369,7 +520,7 @@ export default function MemoryPage() {
                       </div>
                       <button
                         type="button"
-                        className="icon-btn h-7 w-7"
+                        className="icon-btn h-7 w-7 border-border hover:border-cyanx/50 hover:text-cyanx"
                         aria-label="Restore memory"
                         onClick={() => restoreMemory(memory.id)}
                       >
@@ -377,7 +528,7 @@ export default function MemoryPage() {
                       </button>
                       <button
                         type="button"
-                        className="icon-btn h-7 w-7 text-dangerx"
+                        className="icon-btn h-7 w-7 border-border text-dangerx hover:border-dangerx"
                         aria-label="Delete permanently"
                         onClick={() => purgeMemory(memory.id)}
                       >
@@ -392,11 +543,11 @@ export default function MemoryPage() {
         </div>
       </div>
 
-      {/* detail / edit */}
+      {/* detail / edit inspector sheet */}
       <Sheet
         open={open !== null}
         onClose={closeDetail}
-        title="Memory"
+        title="Memory Inspector"
         footer={
           open ? (
             <>
@@ -437,7 +588,7 @@ export default function MemoryPage() {
               </label>
               <input
                 id="memory-title"
-                className="input"
+                className="input bg-surface/70 border-border"
                 value={open.title}
                 onChange={(event) => updateMemory(open.id, { title: event.target.value })}
               />
@@ -449,7 +600,7 @@ export default function MemoryPage() {
               </label>
               <textarea
                 id="memory-content"
-                className="input h-auto resize-none py-3 leading-relaxed"
+                className="input h-auto resize-none py-3 leading-relaxed bg-surface/70 border-border"
                 rows={5}
                 value={open.content}
                 onChange={(event) => updateMemory(open.id, { content: event.target.value })}
@@ -463,14 +614,14 @@ export default function MemoryPage() {
                 </label>
                 <select
                   id="memory-category"
-                  className="input"
+                  className="input bg-surface border-border"
                   value={open.category}
                   onChange={(event) =>
                     updateMemory(open.id, { category: event.target.value as Memory["category"] })
                   }
                 >
                   {["knowledge", "decision", "task", "note", "conversation", "event"].map((category) => (
-                    <option key={category} value={category} className="bg-ink-800">
+                    <option key={category} value={category} className="bg-panel">
                       {category}
                     </option>
                   ))}
@@ -483,14 +634,14 @@ export default function MemoryPage() {
                 </label>
                 <select
                   id="memory-importance"
-                  className="input"
+                  className="input bg-surface border-border"
                   value={open.importance}
                   onChange={(event) =>
                     updateMemory(open.id, { importance: event.target.value as Importance })
                   }
                 >
                   {["noise", "temp", "useful", "important", "structured"].map((importance) => (
-                    <option key={importance} value={importance} className="bg-ink-800">
+                    <option key={importance} value={importance} className="bg-panel">
                       {importance}
                     </option>
                   ))}
@@ -503,14 +654,14 @@ export default function MemoryPage() {
                 </label>
                 <select
                   id="memory-retention"
-                  className="input"
+                  className="input bg-surface border-border"
                   value={open.retentionType}
                   onChange={(event) =>
                     updateMemory(open.id, { retentionType: event.target.value as RetentionType })
                   }
                 >
                   {["session", "30-days", "forever"].map((retention) => (
-                    <option key={retention} value={retention} className="bg-ink-800">
+                    <option key={retention} value={retention} className="bg-panel">
                       {retention}
                     </option>
                   ))}
@@ -523,15 +674,15 @@ export default function MemoryPage() {
                 </label>
                 <select
                   id="memory-project"
-                  className="input"
+                  className="input bg-surface border-border"
                   value={open.projectId ?? ""}
                   onChange={(event) => updateMemory(open.id, { projectId: event.target.value || undefined })}
                 >
-                  <option value="" className="bg-ink-800">
+                  <option value="" className="bg-panel">
                     None
                   </option>
                   {state.projects.map((project) => (
-                    <option key={project.id} value={project.id} className="bg-ink-800">
+                    <option key={project.id} value={project.id} className="bg-panel">
                       {project.name}
                     </option>
                   ))}
@@ -539,7 +690,7 @@ export default function MemoryPage() {
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 pt-2">
               <Chip
                 active={open.importance === "important"}
                 onClick={() =>
@@ -548,7 +699,7 @@ export default function MemoryPage() {
                   })
                 }
               >
-                <Star size={11} /> Mark important
+                <Star size={11} /> Mark as Beacon
               </Chip>
               <Chip
                 active={open.status === "active"}
@@ -559,19 +710,19 @@ export default function MemoryPage() {
                 <Pin size={11} /> {open.status === "active" ? "Active" : "Needs review"}
               </Chip>
               <Chip as="span">
-                updated {relativeTime(open.updatedAt)}
+                Updated {relativeTime(open.updatedAt)}
               </Chip>
             </div>
 
             {open.reason ? (
-              <div className="rounded-md border border-line-subtle bg-ink-850/40 p-3.5">
+              <div className="rounded-xl border border-border bg-panel/40 p-3.5">
                 <TechLabel>Why this was captured</TechLabel>
                 <p className="mt-1.5 text-[12px] leading-relaxed text-txt-secondary">{open.reason}</p>
               </div>
             ) : null}
 
             {open.sourceReferences.length ? (
-              <div className="rounded-md border border-line-subtle bg-ink-850/40 p-3.5">
+              <div className="rounded-xl border border-border bg-panel/40 p-3.5">
                 <TechLabel>Sources · {open.sourceReferences.length}</TechLabel>
                 <div className="mt-2 space-y-1.5">
                   {open.sourceReferences.map((id) => {
@@ -588,21 +739,21 @@ export default function MemoryPage() {
               </div>
             ) : null}
 
-            <div className="flex items-center gap-2">
-              <Pencil size={12} className="text-txt-muted" />
-              <span className="text-[10.5px] text-txt-muted">
-                Changes save instantly to this device.
+            <div className="flex items-center gap-2 pt-1 text-[11px] text-txt-muted">
+              <Pencil size={12} className="text-cyanx" />
+              <span>
+                Changes persist instantly in device local storage.
               </span>
             </div>
           </div>
         ) : null}
       </Sheet>
 
-      {/* create */}
+      {/* create sheet */}
       <Sheet
         open={creating}
         onClose={() => setCreating(false)}
-        title="New memory"
+        title="New Memory"
         footer={
           <>
             <Button variant="ghost" onClick={() => setCreating(false)}>
@@ -621,7 +772,7 @@ export default function MemoryPage() {
             </label>
             <input
               id="new-title"
-              className="input"
+              className="input bg-surface border-border"
               placeholder="What should NeoBrain remember?"
               value={draft.title}
               onChange={(event) => setDraft({ ...draft, title: event.target.value })}
@@ -633,7 +784,7 @@ export default function MemoryPage() {
             </label>
             <textarea
               id="new-content"
-              className="input h-auto resize-none py-3 leading-relaxed"
+              className="input h-auto resize-none py-3 leading-relaxed bg-surface border-border"
               rows={4}
               placeholder="Add the context that makes this useful later."
               value={draft.content}
@@ -646,12 +797,12 @@ export default function MemoryPage() {
             </label>
             <select
               id="new-category"
-              className="input"
+              className="input bg-surface border-border"
               value={draft.category}
               onChange={(event) => setDraft({ ...draft, category: event.target.value as Memory["category"] })}
             >
               {["note", "knowledge", "decision", "task"].map((category) => (
-                <option key={category} value={category} className="bg-ink-800">
+                <option key={category} value={category} className="bg-panel">
                   {category}
                 </option>
               ))}

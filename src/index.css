@@ -8,34 +8,36 @@
 
 @layer base {
   :root {
-    /* Environment */
-    --bg-0: #04090e;
-    --bg-1: #071019;
-    --bg-2: #091720;
-    --surface-1: #0b1a24;
-    --surface-2: #0e222e;
-    --surface-3: #102a37;
-    --surface-4: #143444;
+    /* Environment - Strict NeoBrain Palette */
+    --space: #020407;
+    --bg-0: #020407;
+    --bg-1: #0a0f1c;
+    --bg-2: #0f1b2d;
+    --surface-1: #0f1b2d;
+    --surface-2: #14243b;
+    --surface-3: #1a2e4c;
+    --surface-4: #1e2a3f;
+    --panel: #1e2a3f;
 
-    /* Signal */
-    --cyan: #00d9ff;
-    --blue: #247bff;
-    --violet: #8d6cff;
-    --magenta: #c47bff;
-    --amber: #ff9a57;
-    --green: #23d7a0;
-    --warn: #ffb547;
-    --danger: #ff4d5e;
+    /* Signal - Strict Palette */
+    --cyan: #00d1ff;
+    --blue: #3882f6;
+    --violet: #885cf6;
+    --magenta: #885cf6;
+    --amber: #f59e0b;
+    --green: #10b981;
+    --warn: #f59e0b;
+    --danger: #ef4444;
 
-    /* Type */
-    --text-1: #f4f8fa;
-    --text-2: #91aab8;
-    --text-3: #526d7c;
+    /* Type - Strict Palette */
+    --text-1: #e2e8f0;
+    --text-2: #94a3b8;
+    --text-3: #64748b;
 
     /* Lines */
-    --line-1: rgba(145, 205, 235, 0.1);
-    --line-2: rgba(145, 205, 235, 0.18);
-    --line-3: rgba(145, 205, 235, 0.28);
+    --line-1: rgba(51, 65, 85, 0.45);
+    --line-2: rgba(51, 65, 85, 0.70);
+    --line-3: rgba(0, 209, 255, 0.40);
 
     /* Radii — continuous hierarchy */
     --r-xs: 10px;
@@ -173,9 +175,32 @@
     box-shadow: var(--sh-2), inset 0 1px 0 rgba(190, 225, 245, 0.06);
   }
 
-  /* Matte graphite panel — used for primary containers */
+  /* Level 2: Floating Panels */
   .panel {
-    @apply surface rounded-xl;
+    position: relative;
+    background: rgba(15, 27, 45, 0.70);
+    border: 1px solid rgba(51, 65, 85, 0.50);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 20px;
+    box-shadow: 0 20px 45px -20px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(0, 209, 255, 0.12);
+  }
+
+  .panel-elevated {
+    position: relative;
+    background: rgba(30, 42, 63, 0.60);
+    border: 1px solid rgba(51, 65, 85, 0.65);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-radius: 22px;
+    box-shadow: 0 24px 60px -25px rgba(0, 0, 0, 0.95), inset 0 1px 0 rgba(0, 209, 255, 0.16);
+  }
+
+  /* Level 3: Micro Modules & Technical Instrumentation */
+  .micro-module {
+    background: rgba(10, 15, 28, 0.65);
+    border: 1px solid rgba(51, 65, 85, 0.45);
+    border-radius: 14px;
   }
 
   /* Soft translucent glass — used for chrome + overlays only */

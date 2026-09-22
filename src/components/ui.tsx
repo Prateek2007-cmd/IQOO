@@ -250,6 +250,8 @@ export function MetricTile({
   label,
   accent = "cyan",
   hint,
+  trend,
+  bars,
   className = "",
   onClick,
 }: {
@@ -258,22 +260,24 @@ export function MetricTile({
   label: string;
   accent?: "cyan" | "violet" | "amber" | "green" | "blue";
   hint?: string;
+  trend?: string;
+  bars?: number[];
   className?: string;
   onClick?: () => void;
 }) {
   const accents: Record<string, string> = {
-    cyan: "text-cyanx",
-    violet: "text-violetx",
-    amber: "text-amberx",
-    green: "text-greenx",
-    blue: "text-bluex",
+    cyan: "text-[#00D1FF]",
+    violet: "text-[#885CF6]",
+    amber: "text-[#F59E0B]",
+    green: "text-[#10B981]",
+    blue: "text-[#3882F6]",
   };
-  const ring: Record<string, string> = {
-    cyan: "rgba(0,217,255,0.22)",
-    violet: "rgba(141,108,255,0.22)",
-    amber: "rgba(255,154,87,0.22)",
-    green: "rgba(35,215,160,0.22)",
-    blue: "rgba(36,123,255,0.22)",
+  const barColors: Record<string, string> = {
+    cyan: "bg-[#00D1FF]",
+    violet: "bg-[#885CF6]",
+    amber: "bg-[#F59E0B]",
+    green: "bg-[#10B981]",
+    blue: "bg-[#3882F6]",
   };
 
   const Tag = onClick ? "button" : "div";
@@ -281,22 +285,140 @@ export function MetricTile({
     <Tag
       onClick={onClick}
       className={[
-        "group relative flex flex-col justify-between overflow-hidden rounded-lg border border-line-subtle bg-[linear-gradient(180deg,rgba(16,42,55,0.5)_0%,rgba(7,16,25,0.72)_100%)] p-3.5 text-left transition-all duration-300 ease-premium",
-        onClick ? "hover:border-line-soft hover:shadow-panel active:scale-[0.985]" : "",
+        "group relative flex items-center justify-between overflow-hidden rounded-[14px] border border-[#334155]/50 bg-[#0B1320]/60 px-3.5 py-2.5 backdrop-blur-xl text-left transition-all duration-300 ease-premium shadow-[0_8px_20px_-10px_rgba(0,0,0,0.8)]",
+        onClick ? "hover:border-[#00D1FF]/40 hover:bg-[#0F1B2D]/80 active:scale-[0.985]" : "",
         className,
       ].join(" ")}
     >
-      <div
-        className="pointer-events-none absolute -right-6 -top-8 h-20 w-20 rounded-full blur-2xl transition-opacity duration-500 group-hover:opacity-100"
-        style={{ background: `radial-gradient(circle, ${ring[accent]} 0%, rgba(0,0,0,0) 70%)`, opacity: 0.7 }}
-      />
-      <Icon size={16} className={`relative mb-3 ${accents[accent]}`} strokeWidth={1.6} />
-      <div className="relative">
-        <div className="numeral text-[24px] leading-none text-txt-primary">{value}</div>
-        <div className="mt-1.5 text-[11px] font-medium leading-tight text-txt-secondary">{label}</div>
-        {hint ? <div className="mt-1 text-[10px] text-txt-muted">{hint}</div> : null}
+      <div className="flex items-center gap-2.5 min-w-0">
+        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg border border-[#334155]/40 bg-[#020407]/80">
+          <Icon size={14} className={accents[accent]} strokeWidth={1.7} />
+        </span>
+        <div className="min-w-0">
+          <div className="flex items-baseline gap-1.5 min-w-0">
+            <span className="font-mono text-[19px] sm:text-[20px] font-semibold leading-none text-[#E2E8F0] tracking-tight shrink-0">{value}</span>
+            <span className="text-[9.5px] sm:text-[10px] font-mono uppercase tracking-wider text-[#7E8F9F] truncate">{label}</span>
+          </div>
+          {hint ? <div className="mt-0.5 text-[9.5px] text-[#64748B] truncate">{hint}</div> : null}
+        </div>
+      </div>
+
+      {/* Right-side trend or mini histogram */}
+      <div className="flex flex-col items-end justify-center shrink-0 pl-1">
+        {bars && bars.length > 0 ? (
+          <div className="flex items-end gap-0.5 h-4 mb-0.5">
+            {bars.map((b, i) => (
+              <span
+                key={i}
+                className={`w-[3px] rounded-t-xs transition-all duration-300 ${barColors[accent]} ${
+                  i === bars.length - 1 ? "opacity-100 shadow-[0_0_6px_#00D1FF]" : "opacity-35"
+                }`}
+                style={{ height: `${Math.max(20, Math.min(100, b * 100))}%` }}
+              />
+            ))}
+          </div>
+        ) : null}
+        {trend ? (
+          <span className="text-[9.5px] font-mono text-[#64748B]">{trend}</span>
+        ) : null}
       </div>
     </Tag>
+  );
+}
+
+export function MicroHistogram({
+  values = [0.3, 0.5, 0.8, 0.4, 0.9, 0.6, 1.0],
+  accent = "cyan",
+  height = 24,
+}: {
+  values?: number[];
+  accent?: "cyan" | "blue" | "violet" | "amber";
+  height?: number;
+}) {
+  const colorMap = {
+    cyan: "bg-[#00D1FF]",
+    blue: "bg-[#3882F6]",
+    violet: "bg-[#885CF6]",
+    amber: "bg-[#F59E0B]",
+  };
+  return (
+    <div className="flex items-end gap-1.5" style={{ height: `${height}px` }}>
+      {values.map((v, i) => (
+        <span
+          key={i}
+          className={`w-1.5 rounded-t-sm transition-all duration-300 ${colorMap[accent]} ${
+            i === values.length - 1 ? "opacity-100 shadow-[0_0_6px_#00D1FF]" : "opacity-35"
+          }`}
+          style={{ height: `${Math.max(12, Math.min(100, v * 100))}%` }}
+        />
+      ))}
+    </div>
+  );
+}
+
+export function MicroRing({
+  progress = 0.72,
+  size = 40,
+  strokeWidth = 3.5,
+  color = "#00D1FF",
+}: {
+  progress?: number;
+  size?: number;
+  strokeWidth?: number;
+  color?: string;
+}) {
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = circumference - progress * circumference;
+
+  return (
+    <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size }}>
+      <svg className="rotate-[-90deg]" width={size} height={size}>
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke="rgba(51, 65, 85, 0.5)"
+          strokeWidth={strokeWidth}
+          fill="none"
+        />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke={color}
+          strokeWidth={strokeWidth}
+          strokeDasharray={circumference}
+          strokeDashoffset={strokeDashoffset}
+          strokeLinecap="round"
+          fill="none"
+          style={{ filter: `drop-shadow(0 0 5px ${color})` }}
+        />
+      </svg>
+    </div>
+  );
+}
+
+export function MicroSpline({
+  color = "#3882F6",
+  width = 90,
+  height = 24,
+}: {
+  color?: string;
+  width?: number;
+  height?: number;
+}) {
+  return (
+    <svg width={width} height={height} viewBox="0 0 90 24" fill="none" className="overflow-visible">
+      <path
+        d="M2 18 C 20 12, 35 22, 50 14 C 65 6, 75 16, 88 10"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        style={{ filter: `drop-shadow(0 0 4px ${color})` }}
+      />
+      <circle cx="88" cy="10" r="2.5" fill="#00D1FF" style={{ filter: "drop-shadow(0 0 6px #00D1FF)" }} />
+    </svg>
   );
 }
 

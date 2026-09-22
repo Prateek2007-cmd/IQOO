@@ -128,9 +128,19 @@ export default function KnowledgePage() {
   const [query, setQuery] = useState("");
   const [projectFilter, setProjectFilter] = useState<string>("all");
   const [selected, setSelected] = useState<string | null>("k-smartline");
+  const [hovered, setHovered] = useState<string | null>(null);
   const [view, setView] = useState({ k: 1, x: 0, y: 0 });
   const dragRef = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
   const svgRef = useRef<SVGSVGElement | null>(null);
+
+  const KIND_COLORS: Record<string, { stroke: string; fill: string; glow: string }> = {
+    project: { stroke: "#3882F6", fill: "rgba(56, 130, 246, 0.25)", glow: "rgba(56, 130, 246, 0.5)" },
+    person: { stroke: "#885CF6", fill: "rgba(136, 92, 246, 0.25)", glow: "rgba(136, 92, 246, 0.5)" },
+    idea: { stroke: "#F59E0B", fill: "rgba(245, 158, 11, 0.25)", glow: "rgba(245, 158, 11, 0.5)" },
+    file: { stroke: "#10B981", fill: "rgba(16, 185, 129, 0.25)", glow: "rgba(16, 185, 129, 0.5)" },
+    decision: { stroke: "#00D1FF", fill: "rgba(0, 209, 255, 0.3)", glow: "rgba(0, 209, 255, 0.7)" },
+    memory: { stroke: "#885CF6", fill: "rgba(136, 92, 246, 0.25)", glow: "rgba(136, 92, 246, 0.5)" },
+  };
 
   const positions = useMemo(
     () => computeLayout(state.knowledge.nodes, state.knowledge.edges),
@@ -270,49 +280,87 @@ export default function KnowledgePage() {
               const to = positions.find((node) => node.id === edge.to);
               if (!from || !to) return null;
               const faded = !visibleIds.has(edge.from) && !visibleIds.has(edge.to);
-              const active = selected === edge.from || selected === edge.to;
+              const active = selected === edge.from || selected === edge.to || hovered === edge.from || hovered === edge.to;
               return (
-                <line
-                  key={edge.id}
-                  x1={from.x}
-                  y1={from.y}
-                  x2={to.x}
-                  y2={to.y}
-                  stroke={active ? "rgba(0,217,255,0.55)" : "rgba(145,205,235,0.18)"}
-                  strokeWidth={active ? 1.4 : 0.7 + edge.strength * 0.6}
-                  opacity={faded ? 0.12 : 1}
-                />
+                <g key={edge.id}>
+                  <line
+                    x1={from.x}
+                    y1={from.y}
+                    x2={to.x}
+                    y2={to.y}
+                    stroke={active ? "#00D1FF" : "rgba(51, 65, 85, 0.45)"}
+                    strokeWidth={active ? 1.8 : 0.8}
+                    opacity={faded ? 0.1 : active ? 0.85 : 0.4}
+                    style={{ filter: active ? "drop-shadow(0 0 6px rgba(0, 209, 255, 0.6))" : undefined }}
+                  />
+                  {active && (
+                    <circle r="2" fill="#00D1FF">
+                      <animate
+                        attributeName="cx"
+                        values={`${from.x};${to.x}`}
+                        dur="3s"
+                        repeatCount="indefinite"
+                      />
+                      <animate
+                        attributeName="cy"
+                        values={`${from.y};${to.y}`}
+                        dur="3s"
+                        repeatCount="indefinite"
+                      />
+                    </circle>
+                  )}
+                </g>
               );
             })}
 
             {positions.map((node) => {
               const faded = !visibleIds.has(node.id);
               const isSelected = node.id === selected;
-              const radius = 6 + node.weight * 12;
+              const isHovered = node.id === hovered;
+              const radius = 7 + node.weight * 11;
+              const colors = KIND_COLORS[node.kind] || KIND_COLORS.idea;
               return (
                 <g
                   key={node.id}
                   transform={`translate(${node.x} ${node.y})`}
-                  opacity={faded ? 0.18 : 1}
-                  className="cursor-pointer"
+                  opacity={faded ? 0.15 : 1}
+                  className="cursor-pointer transition-all duration-200"
                   onClick={() => setSelected(node.id)}
+                  onPointerEnter={() => setHovered(node.id)}
+                  onPointerLeave={() => setHovered(null)}
                 >
-                  <circle r={radius * 2.4} fill="rgba(0,217,255,0.05)" />
+                  {/* Outer Glow Halo */}
+                  <circle
+                    r={radius * (isSelected ? 2.6 : 2.0)}
+                    fill={colors.glow}
+                    opacity={isSelected || isHovered ? 0.25 : 0.05}
+                  />
+
+                  {/* Base Circle */}
                   <circle
                     r={radius}
-                    fill={isSelected ? "rgba(0,217,255,0.22)" : "rgba(11,26,36,0.9)"}
-                    stroke={isSelected ? "#00d9ff" : node.kind === "project" ? "rgba(141,108,255,0.6)" : "rgba(145,205,235,0.36)"}
-                    strokeWidth={isSelected ? 1.6 : 1}
+                    fill={isSelected ? colors.fill : "#0A0F1C"}
+                    stroke={isSelected ? "#00D1FF" : colors.stroke}
+                    strokeWidth={isSelected || isHovered ? 2 : 1.2}
+                    style={{
+                      filter: isSelected || isHovered ? `drop-shadow(0 0 8px ${colors.stroke})` : undefined,
+                    }}
                   />
+
+                  {/* Inner Project Nucleus */}
                   {node.kind === "project" ? (
-                    <circle r={radius * 0.42} fill="rgba(0,217,255,0.65)" />
+                    <circle r={radius * 0.42} fill="#00D1FF" style={{ filter: "drop-shadow(0 0 4px #00D1FF)" }} />
                   ) : null}
+
+                  {/* Label */}
                   <text
                     y={radius + 15}
                     textAnchor="middle"
                     fontSize="11"
-                    fill={isSelected ? "#eafcff" : "#91aab8"}
-                    style={{ pointerEvents: "none" }}
+                    fontFamily="Space Grotesk, sans-serif"
+                    fontWeight={isSelected || isHovered ? 600 : 400}
+                    fill={isSelected || isHovered ? "#FFFFFF" : "#94A3B8"}
+                    style={{ pointerEvents: "none", textShadow: "0 2px 4px rgba(0,0,0,0.9)" }}
                   >
                     {node.label}
                   </text>
