@@ -279,58 +279,81 @@ function Hero() {
           - Volumetric skylight downbeam
           - Ambient presence halo around the Core
           ========================================================================= */}
+      {/* =========================================================================
+          LAYER 3: Atmospheric environmental integration
+          - Upward cyan platform illumination & reflection
+          - Occlusion shadow under the floating Core
+          - Soft volumetric connection beam
+          - Subtle cyan ambient presence halo behind the Core
+          - Skylight downbeam from observatory dome aperture
+          - Atmospheric micro-particles
+          ========================================================================= */}
       <div className="pointer-events-none absolute inset-0 z-[3] overflow-hidden">
         {/* Floating atmospheric micro-particles */}
         <AtmosphericParticles />
 
-        {/* Upward cyan illumination from circular platform base onto lower Core */}
+        {/* Occlusion / contact shadow on circular floor platform under the Core */}
         <div
-          className="absolute left-1/2 -translate-x-1/2 transition-opacity duration-700"
+          className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
           style={{
-            width: "clamp(360px, 46vw, 640px)",
-            height: "clamp(140px, 20vh, 240px)",
-            bottom: "clamp(12%, 18vh, 24%)",
+            width: "clamp(260px, 30vw, 440px)",
+            height: "clamp(40px, 6vh, 75px)",
+            bottom: "clamp(60px, 8.5vh, 105px)",
             background:
-              "radial-gradient(ellipse 65% 55% at 50% 90%, rgba(0, 225, 255, 0.28) 0%, rgba(0, 160, 255, 0.09) 45%, transparent 75%)",
+              "radial-gradient(ellipse 65% 55% at 50% 50%, rgba(1, 4, 10, 0.65) 0%, rgba(1, 4, 10, 0.25) 55%, transparent 80%)",
+            filter: "blur(14px)",
+          }}
+        />
+
+        {/* Reflected cyan light pool beneath the Core on the circular floor platform */}
+        <div
+          className="absolute left-1/2 -translate-x-1/2 transition-opacity duration-700 pointer-events-none"
+          style={{
+            width: "clamp(380px, 46vw, 680px)",
+            height: "clamp(75px, 10vh, 130px)",
+            bottom: "clamp(55px, 8vh, 100px)",
+            background:
+              "radial-gradient(ellipse 70% 48% at 50% 50%, rgba(0, 225, 255, 0.2) 0%, rgba(0, 160, 245, 0.06) 50%, transparent 80%)",
             filter: "blur(22px)",
             opacity: isHovered ? 0.95 : 0.75,
           }}
         />
 
-        {/* Soft volumetric light shaft connecting floor platform with the Core */}
+        {/* Faint volumetric light shaft connecting floor platform with the hovering Core */}
         <div
           className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
           style={{
-            width: "clamp(340px, 42vw, 540px)",
-            height: "clamp(220px, 30vh, 340px)",
-            bottom: "clamp(12%, 18vh, 24%)",
+            width: "clamp(320px, 38vw, 540px)",
+            height: "clamp(220px, 28vh, 340px)",
+            bottom: "clamp(65px, 9vh, 110px)",
             background:
-              "radial-gradient(ellipse 60% 85% at 50% 100%, rgba(0, 220, 255, 0.18) 0%, rgba(0, 150, 255, 0.06) 55%, transparent 80%)",
-            filter: "blur(28px)",
+              "radial-gradient(ellipse 55% 85% at 50% 100%, rgba(0, 215, 255, 0.12) 0%, rgba(0, 140, 240, 0.035) 60%, transparent 85%)",
+            filter: "blur(30px)",
           }}
         />
 
-        {/* Atmospheric presence glow centered around the Core */}
+        {/* Atmospheric presence glow centered directly behind the Core */}
         <div
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-700"
+          className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-700 pointer-events-none"
           style={{
-            width: "clamp(480px, 58vw, 760px)",
-            height: "clamp(480px, 58vw, 760px)",
+            top: "58.5%",
+            width: "clamp(520px, 52vw, 820px)",
+            height: "clamp(520px, 52vw, 820px)",
             background:
-              "radial-gradient(circle at 50% 50%, rgba(0, 215, 255, 0.09) 0%, rgba(15, 60, 110, 0.035) 45%, transparent 70%)",
-            filter: "blur(32px)",
+              "radial-gradient(circle at 50% 50%, rgba(0, 210, 255, 0.08) 0%, rgba(0, 140, 230, 0.025) 45%, transparent 70%)",
+            filter: "blur(48px)",
             opacity: isHovered ? 1 : 0.8,
           }}
         />
 
         {/* Skylight downlight from observatory dome aperture */}
         <div
-          className="absolute top-0 left-1/2 -translate-x-1/2"
+          className="absolute top-0 left-1/2 -translate-x-1/2 pointer-events-none"
           style={{
             width: "clamp(280px, 34vw, 480px)",
-            height: "40vh",
+            height: "38vh",
             background:
-              "radial-gradient(ellipse 55% 100% at 50% 0%, rgba(215, 245, 255, 0.12) 0%, rgba(140, 210, 255, 0.03) 60%, transparent 90%)",
+              "radial-gradient(ellipse 55% 100% at 50% 0%, rgba(215, 245, 255, 0.11) 0%, rgba(140, 210, 255, 0.025) 60%, transparent 90%)",
             filter: "blur(26px)",
           }}
         />
@@ -338,37 +361,43 @@ function Hero() {
 
       {/* =========================================================================
           LAYER 4: The real interactive NeoBrainCore
-          - Physically integrated into the circular platform on the floor
-          - Floating slightly above the glowing base in 3D perspective
-          - Responds to pointer tracking, hover, and click engagement
+          - Enlarged by ~2.3-2.5x to target 380-430px visual diameter on desktop
+          - Floats suspended 60-100px above the central circular floor platform
+          - Horizontally centered, responsive, uninhibited 3D interactivity
           ========================================================================= */}
       <motion.div
         style={{ y: coreY, scale: coreScale, opacity: coreOpacity }}
-        className="pointer-events-none absolute inset-x-0 bottom-[6%] sm:bottom-[7%] lg:bottom-[8%] z-[10] flex items-center justify-center will-change-transform"
+        className="pointer-events-none absolute inset-0 z-[10] flex items-center justify-center will-change-transform"
       >
         <div
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-          className="pointer-events-auto relative group cursor-pointer transition-transform duration-500 hover:scale-[1.03]"
           style={{
-            width: "clamp(310px, 36vw, 480px)",
-            height: "clamp(310px, 36vw, 480px)",
-            maxWidth: "480px",
-            maxHeight: "480px",
+            position: "absolute",
+            top: "58.5%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "clamp(720px, 66vw, 1080px)",
+            height: "clamp(720px, 66vw, 1080px)",
           }}
+          className="flex items-center justify-center pointer-events-none"
         >
-          <NeoBrainCore
-            state={coreState}
-            quality="high"
-            amplitude={isHovered ? 0.3 : 0}
-            onEngage={handleCoreEngage}
-            style={{
-              background: "transparent",
-              borderRadius: 0,
-              width: "100%",
-              height: "100%",
-            }}
-          />
+          <div
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            className="pointer-events-auto relative group cursor-pointer w-full h-full transition-transform duration-500 hover:scale-[1.025]"
+          >
+            <NeoBrainCore
+              state={coreState}
+              quality="high"
+              amplitude={isHovered ? 0.3 : 0}
+              onEngage={handleCoreEngage}
+              style={{
+                background: "transparent",
+                borderRadius: 0,
+                width: "100%",
+                height: "100%",
+              }}
+            />
+          </div>
         </div>
       </motion.div>
 
@@ -376,14 +405,14 @@ function Hero() {
           LAYER 5: Navigation, Typography, and Flanking Architecture Overlays
           ========================================================================= */}
       {/* FLANKING LEFT PANEL: Intelligence that lives with you */}
-      <div className="absolute left-6 xl:left-14 top-[22%] z-[20] hidden md:flex flex-col gap-1.5 text-left pointer-events-none select-none">
+      <div className="absolute left-6 xl:left-14 top-[20%] z-[20] hidden md:flex flex-col gap-1.5 text-left pointer-events-none select-none">
         <span className="text-[10.5px] font-medium tracking-[0.28em] text-white/70 uppercase font-mono">INTELLIGENCE</span>
         <span className="text-[10.5px] font-medium tracking-[0.28em] text-white/70 uppercase font-mono">THAT LIVES</span>
         <span className="text-[10.5px] font-medium tracking-[0.28em] text-white/70 uppercase font-mono">WITH YOU</span>
       </div>
 
       {/* FLANKING RIGHT PANEL: Vertical cyan pipeline */}
-      <div className="absolute right-6 xl:right-14 top-[22%] z-[20] hidden md:flex items-stretch gap-3.5 text-left pointer-events-none select-none">
+      <div className="absolute right-6 xl:right-14 top-[20%] z-[20] hidden md:flex items-stretch gap-3.5 text-left pointer-events-none select-none">
         <div className="w-[1.5px] bg-gradient-to-b from-cyan-400 via-cyan-400/40 to-transparent shadow-[0_0_10px_rgba(0,217,255,0.7)]" />
         <div className="flex flex-col justify-between py-0.5 space-y-2.5 text-[10px] font-medium tracking-[0.24em] text-white/60 uppercase font-mono">
           <span className="hover:text-cyan-300 transition-colors">CAPTURE</span>
@@ -395,67 +424,69 @@ function Hero() {
       </div>
 
       {/* BOTTOM LEFT CORNER OVERLAY */}
-      <div className="absolute left-6 xl:left-14 bottom-7 z-[20] hidden md:flex flex-col gap-1 text-left pointer-events-none opacity-45 select-none">
+      <div className="absolute left-6 xl:left-14 bottom-6 z-[20] hidden md:flex flex-col gap-1 text-left pointer-events-none opacity-45 select-none">
         <span className="text-[9px] font-medium tracking-[0.26em] text-neutral-400 uppercase font-mono">MORE THAN AN ASSISTANT.</span>
         <span className="text-[9px] font-medium tracking-[0.26em] text-neutral-400 uppercase font-mono">A PART OF YOU.</span>
       </div>
 
       {/* BOTTOM RIGHT CORNER OVERLAY */}
-      <div className="absolute right-6 xl:right-14 bottom-7 z-[20] hidden md:flex flex-col gap-1 text-right pointer-events-none opacity-45 select-none">
+      <div className="absolute right-6 xl:right-14 bottom-6 z-[20] hidden md:flex flex-col gap-1 text-right pointer-events-none opacity-45 select-none">
         <span className="text-[9px] font-medium tracking-[0.26em] text-neutral-400 uppercase font-mono">BUILT FOR</span>
         <span className="text-[9px] font-medium tracking-[0.26em] text-neutral-400 uppercase font-mono">A BRIGHTER YOU</span>
       </div>
 
-      {/* CENTER TYPOGRAPHY BLOCK */}
-      <div className="pointer-events-none relative z-[20] mx-auto flex h-full w-full max-w-[1360px] flex-col items-center justify-start px-6 pt-24 sm:pt-28 md:pt-32">
+      {/* UPPER-MID TYPOGRAPHY BLOCK: Reduced by ~18%, clean breathing room */}
+      <div className="pointer-events-none relative z-[20] mx-auto flex h-full w-full max-w-[1360px] flex-col items-center justify-start px-6 pt-20 sm:pt-24 md:pt-26">
         <motion.div
           style={{ opacity: topTextFade, y: topTextY }}
           className="mx-auto flex flex-col items-center text-center will-change-transform"
         >
           {/* Eyebrow: YOUR SECOND BRAIN */}
-          <div className="text-[11px] sm:text-[12.5px] font-medium tracking-[0.38em] text-neutral-300/85 uppercase mb-3 sm:mb-4 select-none">
+          <div className="text-[10.5px] sm:text-[12px] font-medium tracking-[0.38em] text-neutral-300/85 uppercase mb-2 sm:mb-2.5 select-none">
             YOUR SECOND BRAIN
           </div>
 
-          {/* Main Heading: NEO in white, BRAIN in glowing cyan */}
-          <h1 className="font-display text-[50px] sm:text-[72px] md:text-[88px] lg:text-[104px] font-bold tracking-[0.14em] sm:tracking-[0.16em] leading-none select-none">
+          {/* Main Heading: Reduced ~18% so Core takes primary visual priority */}
+          <h1 className="font-display text-[40px] sm:text-[56px] md:text-[70px] lg:text-[84px] font-bold tracking-[0.14em] sm:tracking-[0.16em] leading-none select-none">
             <span className="text-white drop-shadow-[0_4px_24px_rgba(255,255,255,0.25)]">NEO</span>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-[#38bdf8] to-cyan-300 drop-shadow-[0_0_40px_rgba(0,217,255,0.65)]">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-[#38bdf8] to-cyan-300 drop-shadow-[0_0_36px_rgba(0,217,255,0.65)]">
               BRAIN
             </span>
           </h1>
 
           {/* Supporting Line */}
-          <p className="mt-3.5 sm:mt-4 text-[16px] sm:text-[19px] md:text-[21px] font-light tracking-[0.05em] text-neutral-200">
+          <p className="mt-2.5 sm:mt-3 text-[14px] sm:text-[16px] md:text-[18px] font-light tracking-[0.05em] text-neutral-200">
             Perceive. Remember. Connect.
           </p>
 
           {/* Secondary Text */}
-          <p className="mt-1.5 text-[13px] sm:text-[14.5px] text-neutral-400 font-normal max-w-[50ch]">
+          <p className="mt-1 text-[12px] sm:text-[13px] text-neutral-400/90 font-normal max-w-[46ch]">
             An intelligent memory layer for everything you do.
           </p>
-
-          {/* Action CTAs: Explore NeoBrain + Watch Video */}
-          <div className="pointer-events-auto mt-6 sm:mt-7 flex items-center justify-center gap-4">
-            <button
-              onClick={() => navigate("/auth?returnTo=%2Fapp%2Fboot")}
-              className="group rounded-full border border-white/20 bg-black/40 px-6 py-2.5 text-[13px] font-medium tracking-wide text-white backdrop-blur-md transition-all duration-300 hover:border-cyan-400/80 hover:bg-cyan-950/25 hover:shadow-[0_0_24px_rgba(0,217,255,0.35)] active:scale-95"
-            >
-              <span>Explore NeoBrain</span>
-              <span className="ml-1.5 transition-transform duration-200 group-hover:translate-x-1 inline-block">→</span>
-            </button>
-
-            <button
-              onClick={() => navigate("/auth?returnTo=%2Fapp%2Fvoice")}
-              className="group rounded-full border border-transparent hover:border-white/15 bg-transparent px-4 py-2.5 text-[13px] font-medium tracking-wide text-neutral-300 hover:text-white backdrop-blur-sm transition-all duration-300 flex items-center gap-2.5 active:scale-95"
-            >
-              <span className="flex items-center justify-center w-6 h-6 rounded-full border border-cyan-400/60 bg-cyan-950/40 text-cyan-300 text-[10px] pl-0.5 shadow-[0_0_10px_rgba(0,217,255,0.3)] transition-transform duration-300 group-hover:scale-110">
-                ▶
-              </span>
-              <span>Watch Video</span>
-            </button>
-          </div>
         </motion.div>
+      </div>
+
+      {/* BOTTOM ACTION CTAs: Clean vertical separation beneath the Core */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-7 sm:bottom-8 lg:bottom-9 z-[30] flex items-center justify-center px-6">
+        <div className="pointer-events-auto flex items-center justify-center gap-3 sm:gap-4">
+          <button
+            onClick={() => navigate("/auth?returnTo=%2Fapp%2Fboot")}
+            className="group rounded-full border border-white/20 bg-black/50 px-5 sm:px-6 py-2 sm:py-2.5 text-[12.5px] sm:text-[13px] font-medium tracking-wide text-white backdrop-blur-md transition-all duration-300 hover:border-cyan-400/80 hover:bg-cyan-950/30 hover:shadow-[0_0_24px_rgba(0,217,255,0.35)] active:scale-95"
+          >
+            <span>Explore NeoBrain</span>
+            <span className="ml-1.5 transition-transform duration-200 group-hover:translate-x-1 inline-block">→</span>
+          </button>
+
+          <button
+            onClick={() => navigate("/auth?returnTo=%2Fapp%2Fvoice")}
+            className="group rounded-full border border-white/10 hover:border-white/25 bg-black/30 px-3.5 sm:px-4 py-2 sm:py-2.5 text-[12.5px] sm:text-[13px] font-medium tracking-wide text-neutral-300 hover:text-white backdrop-blur-sm transition-all duration-300 flex items-center gap-2 active:scale-95"
+          >
+            <span className="flex items-center justify-center w-5 sm:w-5.5 h-5 sm:h-5.5 rounded-full border border-cyan-400/60 bg-cyan-950/40 text-cyan-300 text-[9px] sm:text-[10px] pl-0.5 shadow-[0_0_10px_rgba(0,217,255,0.3)] transition-transform duration-300 group-hover:scale-110">
+              ▶
+            </span>
+            <span>Watch Video</span>
+          </button>
+        </div>
       </div>
     </section>
   );
