@@ -22,7 +22,6 @@ import {
   Mic,
   MonitorSmartphone,
   NotebookPen,
-  PlayCircle,
   Search,
   Sparkles,
   Smartphone,
@@ -58,9 +57,9 @@ function SiteNav() {
   useMotionValueEvent(scrollY, "change", (value) => setScrolled(value > 24));
 
   const links = [
-    { href: "#home", label: "Home" },
+    { href: "#home", label: "Home", active: true },
     { href: "#features", label: "Features" },
-    { href: "#how-it-works", label: "How It Works" },
+    { href: "#how-it-works", label: "How it Works" },
     { href: "#privacy", label: "Privacy" },
     { href: "#developers", label: "For Developers" },
   ];
@@ -70,27 +69,28 @@ function SiteNav() {
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
         scrolled
           ? "border-b border-white/[0.06] bg-[#02050a]/80 backdrop-blur-xl py-3"
-          : "border-b border-white/[0.03] bg-[#02050a]/20 backdrop-blur-md py-4 sm:py-4.5"
+          : "border-b border-white/[0.03] bg-[#02050a]/20 backdrop-blur-md py-4 sm:py-5"
       }`}
     >
-      <nav className="mx-auto flex max-w-[1280px] items-center justify-between gap-6 px-6 sm:px-8" aria-label="Main">
+      <nav className="mx-auto flex max-w-[1360px] items-center justify-between gap-6 px-6 sm:px-10" aria-label="Main">
         {/* Left: Brand */}
-        <a href="#home" className="group flex items-center gap-2.5">
-          <span className="text-cyan-400 transition-transform duration-300 group-hover:scale-105 inline-flex items-center">
-            <NeoBrainMark size={18} />
-          </span>
-          <span className="font-display text-[14.5px] font-bold tracking-[0.18em] text-white">
-            NEOBRAIN
+        <a href="#home" className="group flex items-center">
+          <span className="font-display text-[14.5px] font-semibold tracking-[0.38em] text-white transition-opacity duration-300 group-hover:opacity-90">
+            N E O B R A I N
           </span>
         </a>
 
         {/* Center: Links */}
-        <div className="hidden items-center gap-7 lg:gap-8 md:flex">
+        <div className="hidden items-center gap-7 lg:gap-9 md:flex">
           {links.map((link) => (
             <a
               key={link.label}
               href={link.href}
-              className="text-[11.5px] font-medium tracking-[0.14em] text-neutral-400 uppercase transition-colors duration-200 hover:text-white"
+              className={`text-[13px] font-normal tracking-[0.02em] transition-colors duration-200 ${
+                link.active
+                  ? "relative text-white after:content-[''] after:absolute after:-bottom-1.5 after:left-0 after:w-full after:h-[1.5px] after:bg-cyan-400 after:shadow-[0_0_8px_#00d9ff]"
+                  : "text-neutral-300 hover:text-white"
+              }`}
             >
               {link.label}
             </a>
@@ -101,7 +101,7 @@ function SiteNav() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate("/auth?returnTo=%2Fapp%2Fboot")}
-            className="group relative inline-flex items-center gap-1.5 overflow-hidden rounded-full border border-cyan-400/25 bg-cyan-950/25 px-4 py-1.5 text-[12px] font-medium tracking-[0.05em] text-cyan-200 backdrop-blur-md transition-all duration-300 hover:border-cyan-400/55 hover:bg-cyan-500/15 hover:text-white hover:shadow-[0_0_20px_rgba(0,217,255,0.25)] active:scale-95"
+            className="group relative inline-flex items-center gap-1.5 overflow-hidden rounded-full border border-white/20 bg-black/40 px-4 sm:px-5 py-1.5 text-[12.5px] font-medium tracking-wide text-white backdrop-blur-md transition-all duration-300 hover:border-cyan-400/70 hover:bg-cyan-950/20 hover:shadow-[0_0_18px_rgba(0,217,255,0.25)] active:scale-95"
           >
             <span>Get Early Access</span>
             <span className="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
@@ -216,8 +216,6 @@ function Hero() {
   const coreOpacity = useTransform(scrollYProgress, [0, 0.85], [1, 0]);
   const topTextFade = useTransform(scrollYProgress, [0, 0.42], [1, 0]);
   const topTextY = useTransform(scrollYProgress, [0, 0.42], ["0px", "-35px"]);
-  const bottomTextFade = useTransform(scrollYProgress, [0, 0.52], [1, 0]);
-  const bottomTextY = useTransform(scrollYProgress, [0, 0.52], ["0px", "35px"]);
 
   const handleCoreEngage = () => {
     // Interactively cycle states on click
@@ -340,25 +338,23 @@ function Hero() {
 
       {/* =========================================================================
           LAYER 4: The real interactive NeoBrainCore
-          - Physically integrated into the empty circular platform
-          - Floating slightly above the platform in 3D perspective
-          - Desktop: 380–500px, Large desktop: 450–560px
-          - Reacts to mouse movement, hover increases activity, click interacts
+          - Physically integrated into the circular platform on the floor
+          - Floating slightly above the glowing base in 3D perspective
+          - Responds to pointer tracking, hover, and click engagement
           ========================================================================= */}
       <motion.div
         style={{ y: coreY, scale: coreScale, opacity: coreOpacity }}
-        className="pointer-events-none absolute inset-0 z-[10] flex items-center justify-center will-change-transform"
+        className="pointer-events-none absolute inset-x-0 bottom-[6%] sm:bottom-[7%] lg:bottom-[8%] z-[10] flex items-center justify-center will-change-transform"
       >
         <div
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
           className="pointer-events-auto relative group cursor-pointer transition-transform duration-500 hover:scale-[1.03]"
           style={{
-            width: "clamp(400px, 48vw, 640px)",
-            height: "clamp(400px, 48vw, 640px)",
-            maxWidth: "640px",
-            maxHeight: "640px",
-            transform: "scale(1.18)",
+            width: "clamp(310px, 36vw, 480px)",
+            height: "clamp(310px, 36vw, 480px)",
+            maxWidth: "480px",
+            maxHeight: "480px",
           }}
         >
           <NeoBrainCore
@@ -377,62 +373,86 @@ function Hero() {
       </motion.div>
 
       {/* =========================================================================
-          LAYER 5: Navigation and Typography
-          - Placed above and around the Core
-          - Core remains the undisputed visual focal point
+          LAYER 5: Navigation, Typography, and Flanking Architecture Overlays
           ========================================================================= */}
-      <div className="pointer-events-none relative z-[20] mx-auto flex h-full w-full max-w-[1280px] flex-col justify-between px-6 pb-12 pt-24 sm:pt-28 md:pt-32">
-        {/* UPPER TYPOGRAPHY (Above Core) */}
+      {/* FLANKING LEFT PANEL: Intelligence that lives with you */}
+      <div className="absolute left-6 xl:left-14 top-[22%] z-[20] hidden md:flex flex-col gap-1.5 text-left pointer-events-none select-none">
+        <span className="text-[10.5px] font-medium tracking-[0.28em] text-white/70 uppercase font-mono">INTELLIGENCE</span>
+        <span className="text-[10.5px] font-medium tracking-[0.28em] text-white/70 uppercase font-mono">THAT LIVES</span>
+        <span className="text-[10.5px] font-medium tracking-[0.28em] text-white/70 uppercase font-mono">WITH YOU</span>
+      </div>
+
+      {/* FLANKING RIGHT PANEL: Vertical cyan pipeline */}
+      <div className="absolute right-6 xl:right-14 top-[22%] z-[20] hidden md:flex items-stretch gap-3.5 text-left pointer-events-none select-none">
+        <div className="w-[1.5px] bg-gradient-to-b from-cyan-400 via-cyan-400/40 to-transparent shadow-[0_0_10px_rgba(0,217,255,0.7)]" />
+        <div className="flex flex-col justify-between py-0.5 space-y-2.5 text-[10px] font-medium tracking-[0.24em] text-white/60 uppercase font-mono">
+          <span className="hover:text-cyan-300 transition-colors">CAPTURE</span>
+          <span className="hover:text-cyan-300 transition-colors">UNDERSTAND</span>
+          <span className="hover:text-cyan-300 transition-colors">REMEMBER</span>
+          <span className="hover:text-cyan-300 transition-colors">CONNECT</span>
+          <span className="hover:text-cyan-300 transition-colors">EVOLVE</span>
+        </div>
+      </div>
+
+      {/* BOTTOM LEFT CORNER OVERLAY */}
+      <div className="absolute left-6 xl:left-14 bottom-7 z-[20] hidden md:flex flex-col gap-1 text-left pointer-events-none opacity-45 select-none">
+        <span className="text-[9px] font-medium tracking-[0.26em] text-neutral-400 uppercase font-mono">MORE THAN AN ASSISTANT.</span>
+        <span className="text-[9px] font-medium tracking-[0.26em] text-neutral-400 uppercase font-mono">A PART OF YOU.</span>
+      </div>
+
+      {/* BOTTOM RIGHT CORNER OVERLAY */}
+      <div className="absolute right-6 xl:right-14 bottom-7 z-[20] hidden md:flex flex-col gap-1 text-right pointer-events-none opacity-45 select-none">
+        <span className="text-[9px] font-medium tracking-[0.26em] text-neutral-400 uppercase font-mono">BUILT FOR</span>
+        <span className="text-[9px] font-medium tracking-[0.26em] text-neutral-400 uppercase font-mono">A BRIGHTER YOU</span>
+      </div>
+
+      {/* CENTER TYPOGRAPHY BLOCK */}
+      <div className="pointer-events-none relative z-[20] mx-auto flex h-full w-full max-w-[1360px] flex-col items-center justify-start px-6 pt-24 sm:pt-28 md:pt-32">
         <motion.div
           style={{ opacity: topTextFade, y: topTextY }}
           className="mx-auto flex flex-col items-center text-center will-change-transform"
         >
-          {/* Eyebrow */}
-          <div className="inline-flex items-center gap-2 mb-2.5 sm:mb-3">
-            <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(0,229,255,0.9)] animate-pulse" />
-            <span className="text-[10.5px] sm:text-[11.5px] font-semibold tracking-[0.28em] text-cyan-300 uppercase">
-              YOUR SECOND BRAIN
+          {/* Eyebrow: YOUR SECOND BRAIN */}
+          <div className="text-[11px] sm:text-[12.5px] font-medium tracking-[0.38em] text-neutral-300/85 uppercase mb-3 sm:mb-4 select-none">
+            YOUR SECOND BRAIN
+          </div>
+
+          {/* Main Heading: NEO in white, BRAIN in glowing cyan */}
+          <h1 className="font-display text-[50px] sm:text-[72px] md:text-[88px] lg:text-[104px] font-bold tracking-[0.14em] sm:tracking-[0.16em] leading-none select-none">
+            <span className="text-white drop-shadow-[0_4px_24px_rgba(255,255,255,0.25)]">NEO</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-[#38bdf8] to-cyan-300 drop-shadow-[0_0_40px_rgba(0,217,255,0.65)]">
+              BRAIN
             </span>
-          </div>
-
-          {/* Main Heading */}
-          <h1 className="font-display text-[46px] sm:text-[68px] md:text-[82px] lg:text-[94px] font-bold tracking-[-0.025em] leading-none text-transparent bg-clip-text bg-gradient-to-b from-white via-white/95 to-white/70 drop-shadow-[0_4px_30px_rgba(0,180,255,0.18)]">
-            NEOBRAIN
           </h1>
-        </motion.div>
 
-        {/* LOWER TYPOGRAPHY & CTAs (Below Core / Around Platform) */}
-        <motion.div
-          style={{ opacity: bottomTextFade, y: bottomTextY }}
-          className="mx-auto flex flex-col items-center text-center will-change-transform"
-        >
           {/* Supporting Line */}
-          <div className="text-[13px] sm:text-[15px] md:text-[16px] font-medium tracking-[0.24em] uppercase text-cyan-200 drop-shadow-[0_2px_12px_rgba(0,217,255,0.25)]">
+          <p className="mt-3.5 sm:mt-4 text-[16px] sm:text-[19px] md:text-[21px] font-light tracking-[0.05em] text-neutral-200">
             Perceive. Remember. Connect.
-          </div>
+          </p>
 
           {/* Secondary Text */}
-          <p className="mt-2 text-[13.5px] sm:text-[15px] leading-relaxed text-neutral-300 max-w-[48ch] drop-shadow-[0_1px_8px_rgba(0,0,0,0.8)]">
+          <p className="mt-1.5 text-[13px] sm:text-[14.5px] text-neutral-400 font-normal max-w-[50ch]">
             An intelligent memory layer for everything you do.
           </p>
 
-          {/* Action CTAs */}
-          <div className="pointer-events-auto mt-6 flex flex-wrap items-center justify-center gap-3.5 sm:gap-4">
+          {/* Action CTAs: Explore NeoBrain + Watch Video */}
+          <div className="pointer-events-auto mt-6 sm:mt-7 flex items-center justify-center gap-4">
             <button
               onClick={() => navigate("/auth?returnTo=%2Fapp%2Fboot")}
-              className="group relative inline-flex items-center gap-2 rounded-full border border-cyan-400/40 bg-cyan-500/20 px-6 py-3 text-[13.5px] font-medium tracking-[0.04em] text-white shadow-[0_0_28px_rgba(0,217,255,0.3)] backdrop-blur-md transition-all duration-300 hover:border-cyan-400 hover:bg-cyan-500/30 hover:shadow-[0_0_36px_rgba(0,217,255,0.45)] active:scale-95"
+              className="group rounded-full border border-white/20 bg-black/40 px-6 py-2.5 text-[13px] font-medium tracking-wide text-white backdrop-blur-md transition-all duration-300 hover:border-cyan-400/80 hover:bg-cyan-950/25 hover:shadow-[0_0_24px_rgba(0,217,255,0.35)] active:scale-95"
             >
               <span>Explore NeoBrain</span>
-              <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+              <span className="ml-1.5 transition-transform duration-200 group-hover:translate-x-1 inline-block">→</span>
             </button>
 
             <button
               onClick={() => navigate("/auth?returnTo=%2Fapp%2Fvoice")}
-              className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-5 py-3 text-[13.5px] font-medium tracking-[0.04em] text-neutral-300 backdrop-blur-md transition-all duration-300 hover:border-white/20 hover:bg-white/[0.08] hover:text-white active:scale-95"
+              className="group rounded-full border border-transparent hover:border-white/15 bg-transparent px-4 py-2.5 text-[13px] font-medium tracking-wide text-neutral-300 hover:text-white backdrop-blur-sm transition-all duration-300 flex items-center gap-2.5 active:scale-95"
             >
-              <PlayCircle size={15} className="text-cyan-400 transition-transform duration-300 group-hover:scale-110" />
-              <span>Watch the experience</span>
-              <span className="transition-transform duration-200 group-hover:translate-x-0.5 text-neutral-400">→</span>
+              <span className="flex items-center justify-center w-6 h-6 rounded-full border border-cyan-400/60 bg-cyan-950/40 text-cyan-300 text-[10px] pl-0.5 shadow-[0_0_10px_rgba(0,217,255,0.3)] transition-transform duration-300 group-hover:scale-110">
+                ▶
+              </span>
+              <span>Watch Video</span>
             </button>
           </div>
         </motion.div>
