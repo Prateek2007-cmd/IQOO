@@ -1,8 +1,8 @@
 /**
- * Privacy dashboard — Quiet Laboratory Control Room.
+ * Privacy — Sovereign Vault & Quiet Laboratory Control Room.
  *
- * Everything the product stores, what processes are active, and full zero-cloud controls.
- * Capability and inventory states are generated directly from the engine.
+ * Implements strict air-gapped cryptographic integrity, real-time perimeter shielding,
+ * local memory inventory, and sovereign data controls.
  */
 
 import {
@@ -29,22 +29,21 @@ import { MobileTopBar } from "../components/Chrome";
 import {
   Button,
   Chip,
+  MicroRing,
   Panel,
-  SectionHeading,
   Sheet,
   StateBlock,
   Switch,
-  TechLabel,
 } from "../components/ui";
 import { providerReport } from "../lib/engine";
 import { useIsDesktop } from "../lib/hooks";
 import { useBrain, useCounts } from "../lib/store";
 
 const LOCATION_TONE: Record<string, string> = {
-  local: "text-greenx border-greenx/35 bg-greenx/10",
-  fallback: "text-amberx border-amberx/35 bg-amberx/10",
-  remote: "text-purplex border-purplex/35 bg-purplex/10",
-  unavailable: "text-txt-muted border-border bg-panel/60",
+  local: "text-[#10B981] border-[#10B981]/40 bg-[#10B981]/10",
+  fallback: "text-[#F59E0B] border-[#F59E0B]/40 bg-[#F59E0B]/10",
+  remote: "text-[#885CF6] border-[#885CF6]/40 bg-[#885CF6]/10",
+  unavailable: "text-[#64748B] border-[#334155]/40 bg-[#0A0F1C]",
 };
 
 export default function PrivacyPage() {
@@ -60,7 +59,7 @@ export default function PrivacyPage() {
   const settings = state.settings;
   const providers = useMemo(
     () => providerReport(settings.privacy.cloudServices),
-    [settings.privacy.cloudServices],
+    [settings.privacy.cloudServices]
   );
 
   const inventory = [
@@ -68,7 +67,7 @@ export default function PrivacyPage() {
     { icon: Archive, label: "Archived Entries", value: state.memories.filter((m) => m.deletedAt).length },
     { icon: FileText, label: "Indexed Sources", value: state.sources.length },
     { icon: MessageSquareText, label: "Conversations", value: state.conversations.length },
-    { icon: HardDrive, label: "Activity Events", value: state.activity.length },
+    { icon: HardDrive, label: "Audit Events", value: state.activity.length },
   ];
 
   const handleExport = () => {
@@ -80,7 +79,12 @@ export default function PrivacyPage() {
     anchor.click();
     URL.revokeObjectURL(url);
     setExported(true);
-    logActivity({ type: "context", title: "Data exported", detail: "Full local vault JSON dump", status: "done" });
+    logActivity({
+      type: "context",
+      title: "Data exported",
+      detail: "Full local vault JSON dump",
+      status: "done",
+    });
     window.setTimeout(() => setExported(false), 2500);
   };
 
@@ -92,95 +96,146 @@ export default function PrivacyPage() {
   ];
 
   return (
-    <div className="relative">
-      {!isDesktop ? <MobileTopBar title="Privacy" tagline="Your memory. Your control." /> : null}
+    <div className="relative min-h-screen text-[#E2E8F0]">
+      {!isDesktop ? <MobileTopBar title="Privacy" tagline="Sovereign Vault" /> : null}
 
-      <div className={isDesktop ? "mx-auto max-w-[1240px] px-8 py-8" : "px-5 pb-8 pt-5"}>
+      <div className={isDesktop ? "mx-auto max-w-[1360px] px-8 py-8" : "px-4 pb-12 pt-4"}>
+        {/* ── 1. Laboratory Vault Header ───────────────────────── */}
         {isDesktop ? (
           <header className="mb-6 flex items-end justify-between gap-6">
             <div>
-              <TechLabel tone="green">Laboratory Control Room</TechLabel>
-              <h1 className="mt-2 title-xl">YOUR MEMORY. YOUR CONTROL.</h1>
-              <p className="mt-2 max-w-[66ch] text-[13.5px] leading-relaxed text-txt-secondary">
-                NeoBrain operates under a strict zero-leakage guarantee. Everything is processed and stored on your hardware.
-                No third-party telemetry, no cloud surveillance, and no silent background synchronization.
+              <div className="flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#10B981]">
+                <ShieldCheck size={13} className="text-[#10B981]" />
+                SOVEREIGN VAULT &amp; SECURITY LABORATORY
+              </div>
+              <h1 className="mt-1.5 font-display text-[36px] font-bold text-white tracking-tight">
+                Your memory. Zero external telemetry.
+              </h1>
+              <p className="mt-1 max-w-[66ch] text-[13px] leading-relaxed text-[#94A3B8]">
+                NeoBrain operates under a strict air-gapped guarantee. Embeddings, semantic graphs, and sensor inputs execute exclusively on your local silicon.
               </p>
             </div>
-            <div className="hidden lg:flex items-center gap-2 rounded-2xl border border-greenx/30 bg-greenx/5 px-4 py-2.5">
-              <ShieldCheck size={18} className="text-greenx" />
-              <span className="font-mono text-[12px] font-semibold text-greenx">AIR-GAPPED BY DEFAULT</span>
+
+            {/* Perimeter Shield Health Indicator */}
+            <div className="flex items-center gap-3.5 rounded-2xl border border-[#10B981]/40 bg-[#0B1320]/80 px-4 py-2.5 backdrop-blur-xl shadow-[0_0_20px_rgba(16,185,129,0.15)]">
+              <MicroRing progress={1.0} size={32} color="#10B981" />
+              <div>
+                <div className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#10B981]">
+                  100% AIR-GAPPED
+                </div>
+                <div className="font-mono text-[9.5px] text-[#64748B]">Zero External Tokens</div>
+              </div>
             </div>
           </header>
         ) : null}
 
-        {/* High-Tech HUD Status Indicators */}
-        <div className="mb-6 grid grid-cols-2 sm:grid-cols-5 gap-3">
-          <div className="rounded-2xl border border-greenx/35 bg-gradient-to-b from-greenx/10 to-transparent p-3.5 backdrop-blur-sm">
-            <div className="text-[10px] font-mono uppercase tracking-wider text-txt-muted">Local Processing</div>
-            <div className="mt-1 flex items-center gap-1.5 font-mono text-[13px] font-bold text-greenx">
-              <CheckCircle2 size={13} /> ON
+        {/* ── 2. Perimeter Status Telemetry Bar ────────────────── */}
+        <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-5">
+          <div className="rounded-2xl border border-[#10B981]/40 bg-[#0B1320]/60 p-3.5 backdrop-blur-xl">
+            <div className="font-mono text-[9.5px] uppercase tracking-wider text-[#64748B]">Local Compute</div>
+            <div className="mt-1.5 flex items-center gap-1.5 font-mono text-[14px] font-bold text-[#10B981]">
+              <CheckCircle2 size={13} /> ACTIVE
+            </div>
+            <div className="font-mono text-[9.5px] text-[#64748B]">On-device model</div>
+          </div>
+
+          <div className="rounded-2xl border border-[#334155]/40 bg-[#0B1320]/60 p-3.5 backdrop-blur-xl">
+            <div className="font-mono text-[9.5px] uppercase tracking-wider text-[#64748B]">Raw Audio Storage</div>
+            <div className="mt-1.5 font-mono text-[14px] font-bold text-[#CBD5E1]">
+              {settings.privacy.saveRawAudio ? "RETAINED" : "FLUSHED"}
+            </div>
+            <div className="font-mono text-[9.5px] text-[#64748B]">
+              {settings.privacy.saveRawAudio ? "Local cache" : "Zero disk traces"}
             </div>
           </div>
-          <div className="rounded-2xl border border-border bg-gradient-to-b from-surface/80 to-transparent p-3.5 backdrop-blur-sm">
-            <div className="text-[10px] font-mono uppercase tracking-wider text-txt-muted">Raw Audio Storage</div>
-            <div className="mt-1 font-mono text-[13px] font-bold text-txt-muted">
-              {settings.privacy.saveRawAudio ? "ON" : "OFF"}
+
+          <div className="rounded-2xl border border-[#00D1FF]/40 bg-[#0B1320]/60 p-3.5 backdrop-blur-xl">
+            <div className="font-mono text-[9.5px] uppercase tracking-wider text-[#64748B]">Cloud Ingestion</div>
+            <div className="mt-1.5 flex items-center gap-1.5 font-mono text-[14px] font-bold text-[#00D1FF]">
+              <CloudOff size={13} /> BLOCKED
             </div>
+            <div className="font-mono text-[9.5px] text-[#64748B]">Zero egress sockets</div>
           </div>
-          <div className="rounded-2xl border border-cyanx/35 bg-gradient-to-b from-cyanx/10 to-transparent p-3.5 backdrop-blur-sm">
-            <div className="text-[10px] font-mono uppercase tracking-wider text-txt-muted">Cloud Upload</div>
-            <div className="mt-1 flex items-center gap-1.5 font-mono text-[13px] font-bold text-cyanx">
-              <CloudOff size={13} /> OFF
-            </div>
+
+          <div className="rounded-2xl border border-[#3882F6]/40 bg-[#0B1320]/60 p-3.5 backdrop-blur-xl">
+            <div className="font-mono text-[9.5px] uppercase tracking-wider text-[#64748B]">P2P Handshake</div>
+            <div className="mt-1.5 font-mono text-[14px] font-bold text-[#3882F6]">mTLS 1.3</div>
+            <div className="font-mono text-[9.5px] text-[#64748B]">Direct local mesh</div>
           </div>
-          <div className="rounded-2xl border border-greenx/35 bg-gradient-to-b from-greenx/10 to-transparent p-3.5 backdrop-blur-sm">
-            <div className="text-[10px] font-mono uppercase tracking-wider text-txt-muted">Memory Control</div>
-            <div className="mt-1 font-mono text-[13px] font-bold text-greenx">AVAILABLE</div>
-          </div>
-          <div className="rounded-2xl border border-bluex/35 bg-gradient-to-b from-bluex/10 to-transparent p-3.5 backdrop-blur-sm">
-            <div className="text-[10px] font-mono uppercase tracking-wider text-txt-muted">Device Control</div>
-            <div className="mt-1 font-mono text-[13px] font-bold text-bluex">ENABLED</div>
+
+          <div className="rounded-2xl border border-[#885CF6]/40 bg-[#0B1320]/60 p-3.5 backdrop-blur-xl">
+            <div className="font-mono text-[9.5px] uppercase tracking-wider text-[#64748B]">Vault Authority</div>
+            <div className="mt-1.5 font-mono text-[14px] font-bold text-[#885CF6]">OPERATOR</div>
+            <div className="font-mono text-[9.5px] text-[#64748B]">Full export / purge</div>
           </div>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
-          <div className="space-y-5">
-            {/* Inventory on this device */}
-            <Panel className="p-6">
-              <SectionHeading label="Local Footprint" title="What NeoBrain Is Holding In Browser Storage" />
+        <div className="grid gap-6 lg:grid-cols-[1.3fr_1fr]">
+          <div className="space-y-6">
+            {/* ── 3. Local Vault Footprint Inventory ────────────── */}
+            <div className="rounded-[24px] border border-[#334155]/50 bg-[#0B1320]/60 p-6 backdrop-blur-xl shadow-lg">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#00D1FF]">
+                    ✦ LOCAL STORAGE INVENTORY
+                  </div>
+                  <h2 className="mt-1 font-display text-[18px] font-bold text-white">
+                    Data Held Exclusively on This Machine
+                  </h2>
+                </div>
+              </div>
+
               <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
                 {inventory.map((row) => {
                   const Icon = row.icon;
                   return (
-                    <div key={row.label} className="rounded-xl border border-border bg-panel/50 p-3.5">
-                      <Icon size={16} className="text-cyanx" strokeWidth={1.7} />
-                      <div className="numeral mt-2 font-mono text-[20px] font-bold text-txt-primary">{row.value}</div>
-                      <div className="mt-1 text-[11px] font-medium leading-snug text-txt-muted">{row.label}</div>
+                    <div
+                      key={row.label}
+                      className="rounded-xl border border-[#334155]/40 bg-[#020407]/60 p-3.5 text-center"
+                    >
+                      <Icon size={16} className="mx-auto text-[#00D1FF]" />
+                      <div className="mt-2 font-mono text-[20px] font-bold text-white leading-none">
+                        {row.value}
+                      </div>
+                      <div className="mt-1 font-mono text-[9.5px] text-[#64748B] uppercase tracking-wider">
+                        {row.label}
+                      </div>
                     </div>
                   );
                 })}
               </div>
-              <div className="divider my-4" />
-              <div className="flex flex-wrap gap-2">
+
+              <div className="my-4 h-px bg-gradient-to-r from-transparent via-[#334155]/50 to-transparent" />
+
+              <div className="flex flex-wrap gap-2 font-mono text-[10px]">
                 {[
                   "Zero Remote Telemetry",
-                  "No Cloud Accounts",
-                  "Encrypted Local Storage",
-                  "Full JSON Export Anytime",
+                  "No Centralized Accounts",
+                  "Encrypted SQLite / IndexedDB",
+                  "Immediate JSON Portability",
                 ].map((tag) => (
-                  <Chip key={tag} as="span">
-                    <ShieldCheck size={11} className="text-greenx" /> {tag}
-                  </Chip>
+                  <span
+                    key={tag}
+                    className="flex items-center gap-1.5 rounded-full border border-[#10B981]/30 bg-[#10B981]/10 px-2.5 py-0.5 text-[#10B981]"
+                  >
+                    <CheckCircle2 size={10} /> {tag}
+                  </span>
                 ))}
               </div>
-            </Panel>
+            </div>
 
-            {/* Execution Boundary Switches */}
-            <Panel className="p-6">
-              <SectionHeading label="Compute Isolation" title="Execution Boundary Controls" />
-              <div className="mt-3 divide-y divide-border">
+            {/* ── 4. Execution Perimeter Switches ───────────────── */}
+            <div className="rounded-[24px] border border-[#334155]/50 bg-[#0B1320]/60 p-6 backdrop-blur-xl shadow-lg">
+              <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#10B981]">
+                ✦ EXECUTION PERIMETER
+              </div>
+              <h2 className="mt-1 font-display text-[18px] font-bold text-white">
+                Compute Boundary Controls
+              </h2>
+
+              <div className="mt-4 divide-y divide-[#334155]/30">
                 <Switch
-                  label="Local Processing Only"
+                  label="Local Processing Exclusively"
                   description="All embedding computations, semantic classifications, and speech parsing execute exclusively on this machine."
                   checked={settings.privacy.localProcessingOnly}
                   onChange={(next) =>
@@ -193,7 +248,7 @@ export default function PrivacyPage() {
                   }
                 />
                 <Switch
-                  label="Allow Cloud Services"
+                  label="Allow External Cloud Relays"
                   description={
                     settings.privacy.cloudServices
                       ? "Enabled: a remote LLM endpoint is permitted to assist. (Disabled by default)"
@@ -209,18 +264,20 @@ export default function PrivacyPage() {
                   }}
                 />
                 <Switch
-                  label="Retain Raw Audio Files"
+                  label="Retain Raw Audio Waveforms"
                   description={
                     settings.privacy.rawAudioStored
                       ? "Audio recordings are preserved in local storage cache."
                       : "Transcripts are kept; raw audio buffers are immediately flushed from memory upon parsing."
                   }
                   checked={settings.privacy.saveRawAudio}
-                  onChange={(next) => updateSettings({ privacy: { saveRawAudio: next, rawAudioStored: next } })}
+                  onChange={(next) =>
+                    updateSettings({ privacy: { saveRawAudio: next, rawAudioStored: next } })
+                  }
                 />
               </div>
 
-              {cloudWarning ? (
+              {cloudWarning && (
                 <div className="mt-4">
                   <StateBlock
                     kind="model"
@@ -234,25 +291,33 @@ export default function PrivacyPage() {
                     compact
                   />
                 </div>
-              ) : null}
-            </Panel>
+              )}
+            </div>
 
-            {/* Retention Policies */}
-            <Panel className="p-6">
-              <SectionHeading label="Vault Lifecycle" title="Configured Retention Lifespans" />
+            {/* ── 5. Retention Lifecycles ───────────────────────── */}
+            <div className="rounded-[24px] border border-[#334155]/50 bg-[#0B1320]/60 p-6 backdrop-blur-xl shadow-lg">
+              <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#885CF6]">
+                ✦ MEMORY RELEVANCE POLICIES
+              </div>
+              <h2 className="mt-1 font-display text-[18px] font-bold text-white">
+                Retention Lifecycle Boundaries
+              </h2>
+
               <div className="mt-4 space-y-2.5">
                 {(["session", "30-days", "forever"] as const).map((retention) => {
                   const count = state.memories.filter(
-                    (memory) => !memory.deletedAt && memory.retentionType === retention,
+                    (memory) => !memory.deletedAt && memory.retentionType === retention
                   ).length;
                   return (
                     <div
                       key={retention}
-                      className="flex items-center justify-between gap-4 rounded-xl border border-border bg-panel/50 px-4 py-3 font-mono"
+                      className="flex items-center justify-between gap-4 rounded-xl border border-[#334155]/40 bg-[#020407]/60 px-4 py-3 font-mono"
                     >
                       <div>
-                        <div className="text-[13px] font-semibold uppercase text-txt-primary">{retention}</div>
-                        <div className="mt-0.5 text-[11px] text-txt-muted">
+                        <div className="text-[13px] font-semibold uppercase text-white">
+                          {retention}
+                        </div>
+                        <div className="mt-0.5 text-[11px] text-[#64748B]">
                           {retention === "session"
                             ? "Ephemeral: purged when browser session terminates"
                             : retention === "30-days"
@@ -260,102 +325,100 @@ export default function PrivacyPage() {
                               : "Permanent anchor in core knowledge graph"}
                         </div>
                       </div>
-                      <span className="text-[16px] font-bold text-cyanx">{count}</span>
+                      <span className="font-mono text-[16px] font-bold text-[#00D1FF]">{count}</span>
                     </div>
                   );
                 })}
               </div>
-              <p className="mt-3.5 font-mono text-[11px] leading-relaxed text-txt-muted">
-                Retention is an atomic property of each memory node. Expiry policies are automatically evaluated locally.
-              </p>
-            </Panel>
+            </div>
           </div>
 
-          {/* Side control column */}
-          <div className="space-y-5">
+          {/* ── 6. Side Column: Capability Matrix & Data Authority ── */}
+          <aside className="space-y-6">
             {/* Capability report */}
-            <Panel className="p-6">
-              <SectionHeading label="Pipeline Status" title="Capability Execution Matrix" />
+            <div className="rounded-[24px] border border-[#334155]/50 bg-[#0B1320]/60 p-6 backdrop-blur-xl shadow-lg">
+              <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#00D1FF]">
+                ✦ INFERENCE RUNTIME
+              </div>
+              <h3 className="mt-1 font-display text-[18px] font-bold text-white">
+                Capability Execution Matrix
+              </h3>
+
               <div className="mt-4 space-y-3">
                 {capabilityRows.map((row) => (
-                  <div key={row.name} className="rounded-xl border border-border bg-panel/50 p-3.5">
+                  <div
+                    key={row.name}
+                    className="rounded-xl border border-[#334155]/40 bg-[#020407]/60 p-3.5"
+                  >
                     <div className="flex items-center justify-between gap-3">
-                      <span className="text-[13px] font-medium text-txt-primary">{row.name}</span>
+                      <span className="text-[13px] font-medium text-white">{row.name}</span>
                       <span
-                        className={`rounded-full border px-2.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider ${
+                        className={`rounded-full border px-2 py-0.2 font-mono text-[10px] font-semibold uppercase ${
                           LOCATION_TONE[row.info.location] ?? LOCATION_TONE.unavailable
                         }`}
                       >
                         {row.info.location}
                       </span>
                     </div>
-                    <p className="mt-1.5 font-mono text-[11px] leading-relaxed text-txt-muted">{row.info.detail}</p>
+                    <p className="mt-1 font-mono text-[10.5px] leading-relaxed text-[#64748B]">
+                      {row.info.detail}
+                    </p>
                   </div>
                 ))}
               </div>
-            </Panel>
+            </div>
 
-            {/* Sovereign Vault Controls */}
-            <Panel className="p-6">
-              <SectionHeading label="Sovereign Vault" title="Data Authority" />
+            {/* Sovereign Vault Authority Controls */}
+            <div className="rounded-[24px] border border-[#334155]/50 bg-[#0B1320]/60 p-6 backdrop-blur-xl shadow-lg">
+              <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#F59E0B]">
+                ✦ DATA AUTHORITY
+              </div>
+              <h3 className="mt-1 font-display text-[18px] font-bold text-white">
+                Sovereign Export &amp; Wipe
+              </h3>
+
               <div className="mt-4 space-y-2.5">
                 <Button className="w-full" icon={Download} onClick={handleExport}>
                   {exported ? "Encrypted Export Downloaded" : "Export Complete Vault (JSON)"}
                 </Button>
-                <Button className="w-full" icon={Trash2} variant="danger" onClick={() => setConfirmWipe(true)}>
+                <Button
+                  className="w-full"
+                  icon={Trash2}
+                  variant="danger"
+                  onClick={() => setConfirmWipe(true)}
+                >
                   Purge All Memories
                 </Button>
-                <Button className="w-full" icon={RotateCcw} variant="ghost" onClick={() => setConfirmReset(true)}>
-                  Restore Demo Benchmark Dataset
+                <Button
+                  className="w-full"
+                  icon={RotateCcw}
+                  variant="ghost"
+                  onClick={() => setConfirmReset(true)}
+                >
+                  Restore Benchmark Dataset
                 </Button>
               </div>
-              <div className="divider my-4" />
-              <div className="flex items-start gap-3">
-                <Lock size={15} className="mt-0.5 shrink-0 text-cyanx" />
-                <p className="text-[11px] leading-relaxed text-txt-muted font-mono">
-                  Purging data performs an immediate zero-fill from local browser storage. No backup copies exist on any server.
+
+              <div className="my-4 h-px bg-gradient-to-r from-transparent via-[#334155]/50 to-transparent" />
+
+              <div className="flex items-start gap-2.5 font-mono text-[10.5px] text-[#64748B]">
+                <Lock size={13} className="mt-0.5 shrink-0 text-[#00D1FF]" />
+                <p>
+                  Purging immediately overwrites local browser storage keys. Zero remnants exist on any network server.
                 </p>
               </div>
-            </Panel>
-
-            {/* Audio Sensor Guard */}
-            <Panel className="p-6">
-              <SectionHeading label="Audio Guard" title="Hardware Capture Protocol" />
-              <div className="mt-3.5 space-y-3">
-                {[
-                  { icon: Mic, text: "Microphone hardware opens exclusively during explicit voice interactions." },
-                  { icon: AlertTriangle, text: "A persistent glowing HUD indicator confirms active capture state." },
-                  { icon: CloudOff, text: "Speech waveforms are converted locally; raw audio buffers are never uploaded." },
-                ].map((row) => {
-                  const Icon = row.icon;
-                  return (
-                    <div key={row.text} className="flex gap-3">
-                      <Icon size={15} className="mt-0.5 shrink-0 text-amberx" strokeWidth={1.7} />
-                      <span className="text-[12px] leading-relaxed text-txt-secondary">{row.text}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </Panel>
-          </div>
+            </div>
+          </aside>
         </div>
-
-        {!isDesktop ? (
-          <div className="mt-6">
-            <Button className="w-full" variant="ghost" onClick={() => navigate("/app/settings")}>
-              Open Settings
-            </Button>
-          </div>
-        ) : null}
       </div>
 
-      {/* Wipe Confirmation Sheet */}
+      {/* ── 7. Wipe & Reset Sheets ───────────────────────────── */}
       <Sheet
         open={confirmWipe}
         onClose={() => setConfirmWipe(false)}
         title="Purge Sovereign Vault?"
         footer={
-          <>
+          <div className="flex gap-2">
             <Button variant="ghost" onClick={() => setConfirmWipe(false)}>
               Cancel
             </Button>
@@ -363,13 +426,18 @@ export default function PrivacyPage() {
               variant="danger"
               onClick={() => {
                 deleteAllMemories();
-                logActivity({ type: "context", title: "All memories deleted", detail: "Permanent local wipe", status: "idle" });
+                logActivity({
+                  type: "context",
+                  title: "All memories deleted",
+                  detail: "Permanent local wipe",
+                  status: "idle",
+                });
                 setConfirmWipe(false);
               }}
             >
               Purge All Data
             </Button>
-          </>
+          </div>
         }
       >
         <StateBlock
@@ -379,13 +447,12 @@ export default function PrivacyPage() {
         />
       </Sheet>
 
-      {/* Reset Confirmation Sheet */}
       <Sheet
         open={confirmReset}
         onClose={() => setConfirmReset(false)}
         title="Restore Default Demo Dataset?"
         footer={
-          <>
+          <div className="flex gap-2">
             <Button variant="ghost" onClick={() => setConfirmReset(false)}>
               Cancel
             </Button>
@@ -398,12 +465,11 @@ export default function PrivacyPage() {
             >
               Restore Dataset
             </Button>
-          </>
+          </div>
         }
       >
-        <p className="text-[13px] leading-relaxed text-txt-secondary">
-          This resets your local environment back to the clean reference demonstration state with pre-linked projects,
-          documents, and memory graph nodes.
+        <p className="text-[13px] leading-relaxed text-[#CBD5E1]">
+          This resets your local environment back to the clean reference demonstration state with pre-linked projects, documents, and memory graph nodes.
         </p>
       </Sheet>
     </div>

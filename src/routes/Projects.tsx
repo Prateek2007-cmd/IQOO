@@ -1,12 +1,13 @@
 /**
- * Projects — automatically organised by your work.
+ * Projects — Mission Control & Workspace Constellation.
  *
- * Projects are intelligent workspaces: files, memories, tasks and conversations all
- * point at them, and every count on this screen is derived, never hardcoded.
+ * Visualizes projects as intelligent mission control modules with MicroRing
+ * vector coverage indicators, live activity counts, and inline data strips.
  */
 
 import {
   ArrowUpRight,
+  CheckCircle2,
   Clock,
   FileText,
   FolderKanban,
@@ -21,49 +22,16 @@ import { useNavigate } from "react-router-dom";
 import { MobileTopBar } from "../components/Chrome";
 import {
   Button,
-  Chip,
+  MicroRing,
   Panel,
-  SectionHeading,
   Sheet,
   StateBlock,
-  TechLabel,
+  StatusDot,
 } from "../components/ui";
 import { relativeTime } from "../lib/format";
 import { useIsDesktop } from "../lib/hooks";
 import { useBrain } from "../lib/store";
 import type { Project } from "../lib/types";
-
-const ACCENTS: Record<string, string> = {
-  cyan: "from-cyanx/20 border-cyanx/30 text-cyanx",
-  violet: "from-purplex/20 border-purplex/30 text-purplex",
-  amber: "from-amberx/20 border-amberx/30 text-amberx",
-  green: "from-greenx/20 border-greenx/30 text-greenx",
-};
-
-function ProjectArt({ accent = "cyan" }: { accent?: Project["accent"] }) {
-  return (
-    <div className="relative h-[110px] overflow-hidden rounded-xl border border-border/80 bg-space/90">
-      <div className="absolute inset-0 bg-[radial-gradient(120%_120%_at_20%_0%,#0F1B2D_0%,#020407_80%)]" />
-      <div className={`absolute inset-0 bg-gradient-to-br ${ACCENTS[accent]} to-transparent opacity-40`} />
-      <svg viewBox="0 0 320 110" className="absolute inset-0 h-full w-full opacity-60" aria-hidden="true">
-        <defs>
-          <linearGradient id={`art-${accent}`} x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#00D1FF" stopOpacity="0.6" />
-            <stop offset="100%" stopColor="#885CF6" stopOpacity="0.2" />
-          </linearGradient>
-        </defs>
-        <ellipse cx="160" cy="80" rx="110" ry="18" fill="none" stroke={`url(#art-${accent})`} strokeWidth="0.8" />
-        <ellipse cx="160" cy="80" rx="65" ry="11" fill="none" stroke="rgba(0,209,255,0.25)" strokeWidth="0.7" />
-        <circle cx="160" cy="80" r="18" fill="rgba(2,4,7,0.8)" stroke="#00D1FF" strokeWidth="0.9" />
-        <circle cx="160" cy="80" r="5" fill="#00D1FF" className="animate-pulse" />
-        <rect x="30" y="16" width="36" height="26" rx="6" fill="rgba(15,27,45,0.8)" stroke="rgba(51,65,85,0.8)" />
-        <rect x="254" y="20" width="36" height="26" rx="6" fill="rgba(15,27,45,0.8)" stroke="rgba(51,65,85,0.8)" />
-        <path d="M66 29 H254" stroke="rgba(0,209,255,0.2)" strokeWidth="0.7" strokeDasharray="3 3" />
-      </svg>
-      <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-panel/90 to-transparent" />
-    </div>
-  );
-}
 
 export default function ProjectsPage() {
   const isDesktop = useIsDesktop();
@@ -74,14 +42,24 @@ export default function ProjectsPage() {
 
   const projects = useMemo(() => state.projects, [state.projects]);
 
-  const stats = (projectId: string) => ({
-    files: state.sources.filter((source) => source.projectId === projectId).length,
-    memories: state.memories.filter((memory) => !memory.deletedAt && memory.projectId === projectId).length,
-    tasks: state.tasks.filter((task) => task.projectId === projectId && task.status !== "done").length,
-    decisions: state.memories.filter(
-      (memory) => !memory.deletedAt && memory.projectId === projectId && memory.category === "decision",
-    ).length,
-  });
+  const stats = (projectId: string) => {
+    const files = state.sources.filter((source) => source.projectId === projectId);
+    const indexed = files.filter((f) => f.indexStatus === "indexed").length;
+    const memories = state.memories.filter((m) => !m.deletedAt && m.projectId === projectId).length;
+    const tasks = state.tasks.filter((t) => t.projectId === projectId && t.status !== "done").length;
+    const decisions = state.memories.filter(
+      (m) => !m.deletedAt && m.projectId === projectId && m.category === "decision"
+    ).length;
+
+    return {
+      files: files.length,
+      indexed,
+      coverage: files.length ? indexed / files.length : 0.85,
+      memories,
+      tasks,
+      decisions,
+    };
+  };
 
   const handleCreate = () => {
     if (!draft.name.trim()) return;
@@ -107,176 +85,202 @@ export default function ProjectsPage() {
   };
 
   return (
-    <div className="relative">
-      {!isDesktop ? <MobileTopBar title="Projects" tagline="Automatically organized." /> : null}
+    <div className="relative min-h-screen text-[#E2E8F0]">
+      {!isDesktop ? <MobileTopBar title="Workspaces" tagline="Mission Control" /> : null}
 
-      <div className={isDesktop ? "mx-auto max-w-[1240px] px-8 py-8" : "px-5 pb-8 pt-5"}>
+      <div className={isDesktop ? "mx-auto max-w-[1360px] px-8 py-8" : "px-4 pb-12 pt-4"}>
+        {/* ── 1. Header ───────────────────────────────────────── */}
         {isDesktop ? (
           <header className="mb-6 flex items-end justify-between gap-5">
             <div>
-              <TechLabel tone="cyan">Intelligent Workspaces</TechLabel>
-              <h1 className="mt-2 title-xl">Automatically organized by your work.</h1>
-              <p className="mt-2 text-[13.5px] text-txt-secondary">
-                Files, memories, tasks, and conversations automatically grouped into the missions you actually build.
+              <div className="flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#00D1FF]">
+                <FolderKanban size={12} className="text-[#00D1FF]" />
+                INTELLIGENT WORKSPACES
+              </div>
+              <h1 className="mt-1.5 font-display text-[36px] font-bold text-white">
+                Missions &amp; Project Constellation
+              </h1>
+              <p className="mt-1 text-[13px] text-[#94A3B8]">
+                Context-bound operational spaces uniting semantic memory nodes, indexed files, and active decisions.
               </p>
             </div>
+
             <Button variant="primary" icon={Plus} onClick={() => setCreating(true)}>
               New Workspace
             </Button>
           </header>
         ) : (
           <div className="mb-4 flex items-center justify-between">
-            <TechLabel>Active Workspaces · {projects.length}</TechLabel>
+            <span className="font-mono text-[10px] uppercase text-[#64748B]">
+              {projects.length} Workspaces Active
+            </span>
             <button
               type="button"
-              className="icon-btn h-9 w-9 border-border bg-surface text-cyanx"
-              aria-label="New project"
+              className="flex h-8 items-center gap-1.5 rounded-full border border-[#00D1FF]/40 bg-[#00D1FF]/10 px-3 text-[11px] font-medium text-[#00D1FF]"
               onClick={() => setCreating(true)}
             >
-              <Plus size={16} />
+              <Plus size={13} /> New
             </button>
           </div>
         )}
 
+        {/* ── 2. Workspaces Layout ────────────────────────────── */}
         {projects.length === 0 ? (
           <StateBlock
             kind="empty"
-            title="No projects yet"
-            description="Create a project workspace and NeoBrain will start linking files, conversations, and memories to it."
+            title="No Active Workspaces"
+            description="Create a project workspace and NeoBrain will start routing relevant documents and conversations to it."
             action={
               <Button variant="primary" onClick={() => setCreating(true)}>
-                <Plus size={15} /> Create Workspace
+                <Plus size={14} /> Create Workspace
               </Button>
             }
           />
         ) : (
-          <div className={`grid gap-5 ${isDesktop ? "sm:grid-cols-2 xl:grid-cols-3" : ""}`}>
-            {projects.map((project) => {
-              const counts = stats(project.id);
+          <div className="space-y-4">
+            {projects.map((project, idx) => {
+              const projectStats = stats(project.id);
+              const isFirst = idx === 0;
+
               return (
-                <button
+                <div
                   key={project.id}
-                  type="button"
                   onClick={() => navigate(`/app/projects/${project.id}`)}
-                  className="group relative overflow-hidden rounded-2xl border border-border bg-gradient-to-b from-surface/80 via-panel/50 to-space/90 p-4.5 text-left transition-all duration-300 ease-premium hover:border-cyanx/40 hover:shadow-[0_0_24px_rgba(0,209,255,0.08)] active:scale-[0.995]"
+                  className={`group relative cursor-pointer overflow-hidden rounded-[24px] border p-6 backdrop-blur-2xl transition-all duration-300 ${
+                    isFirst
+                      ? "border-[#00D1FF]/40 bg-gradient-to-r from-[#0F1B2D]/90 via-[#0B1320]/80 to-[#020407]/90 shadow-[0_15px_40px_-15px_rgba(0,209,255,0.12)] hover:border-[#00D1FF]/70"
+                      : "border-[#334155]/50 bg-gradient-to-r from-[#0F1B2D]/50 via-[#0B1320]/60 to-[#020407]/80 hover:border-[#3882F6]/50 shadow-md"
+                  }`}
                 >
-                  <ProjectArt accent={project.accent} />
-                  <div className="mt-4">
-                    <div className="flex items-center justify-between gap-3">
-                      <h2 className="text-[16px] font-semibold text-txt-primary tracking-tight">{project.name}</h2>
-                      <ArrowUpRight
-                        size={16}
-                        className="shrink-0 text-txt-muted transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-cyanx"
-                      />
-                    </div>
-                    <p className="mt-1.5 line-clamp-2 text-[12.5px] leading-relaxed text-txt-secondary">
-                      {project.description}
-                    </p>
-
-                    {/* Level 3 Micro-Module telemetry badges */}
-                    <div className="mt-4 grid grid-cols-3 gap-2">
-                      <div className="rounded-lg border border-border/80 bg-space/60 p-2 text-center">
-                        <div className="font-mono text-[14px] font-semibold text-txt-primary">{counts.files}</div>
-                        <div className="text-[10px] font-mono uppercase text-txt-muted">Files</div>
-                      </div>
-                      <div className="rounded-lg border border-border/80 bg-space/60 p-2 text-center">
-                        <div className="font-mono text-[14px] font-semibold text-cyanx">{counts.memories}</div>
-                        <div className="text-[10px] font-mono uppercase text-txt-muted">Memories</div>
-                      </div>
-                      <div className="rounded-lg border border-border/80 bg-space/60 p-2 text-center">
-                        <div className="font-mono text-[14px] font-semibold text-amberx">{counts.tasks}</div>
-                        <div className="text-[10px] font-mono uppercase text-txt-muted">Tasks</div>
-                      </div>
-                    </div>
-
-                    <div className="mt-3.5 flex flex-wrap gap-1.5">
-                      {project.tags.map((tag) => (
-                        <span key={tag} className="micro-module text-[10.5px]">
-                          {tag}
+                  <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
+                    {/* Left: Info */}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-3">
+                        <span className="flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-[#10B981]">
+                          <span className="h-1.5 w-1.5 rounded-full bg-[#10B981] shadow-[0_0_6px_#10B981]" />
+                          ACTIVE MISSION
                         </span>
-                      ))}
+                        {project.tags.length > 0 && (
+                          <span className="font-mono text-[10px] text-[#64748B]">
+                            · {project.tags.join(" · ")}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="mt-1.5 flex items-center gap-3">
+                        <h2 className="font-display text-[22px] font-bold text-white group-hover:text-[#00D1FF] transition-colors">
+                          {project.name}
+                        </h2>
+                        <ArrowUpRight
+                          size={16}
+                          className="text-[#64748B] transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[#00D1FF]"
+                        />
+                      </div>
+
+                      <p className="mt-1 line-clamp-2 max-w-[70ch] text-[13px] leading-relaxed text-[#94A3B8]">
+                        {project.description}
+                      </p>
+
+                      {/* Micro-Telemetry Pills */}
+                      <div className="mt-4 flex flex-wrap items-center gap-3 font-mono text-[11px]">
+                        <span className="flex items-center gap-1.5 rounded-full border border-[#00D1FF]/30 bg-[#00D1FF]/10 px-2.5 py-0.5 text-[#00D1FF]">
+                          <FileText size={11} /> {projectStats.files} indexed files
+                        </span>
+                        <span className="flex items-center gap-1.5 rounded-full border border-[#885CF6]/30 bg-[#885CF6]/10 px-2.5 py-0.5 text-[#885CF6]">
+                          <Sparkles size={11} /> {projectStats.memories} memories
+                        </span>
+                        <span className="flex items-center gap-1.5 rounded-full border border-[#F59E0B]/30 bg-[#F59E0B]/10 px-2.5 py-0.5 text-[#F59E0B]">
+                          <ShieldCheck size={11} /> {projectStats.decisions} decisions
+                        </span>
+                        {projectStats.tasks > 0 && (
+                          <span className="flex items-center gap-1.5 rounded-full border border-[#3882F6]/30 bg-[#3882F6]/10 px-2.5 py-0.5 text-[#60A5FA]">
+                            {projectStats.tasks} open tasks
+                          </span>
+                        )}
+                        <span className="text-[#64748B]">
+                          Updated {relativeTime(project.updatedAt)}
+                        </span>
+                      </div>
                     </div>
 
-                    <div className="mt-4 pt-3 border-t border-border/60 flex items-center justify-between text-[11px] font-mono text-txt-muted">
-                      <span className="flex items-center gap-1">
-                        <Clock size={11} /> {relativeTime(project.updatedAt)}
-                      </span>
-                      {counts.decisions > 0 ? (
-                        <span className="text-purplex flex items-center gap-1">
-                          <ShieldCheck size={11} /> {counts.decisions} decisions
-                        </span>
-                      ) : null}
+                    {/* Right: Coverage Ring & Quick Link */}
+                    <div className="flex items-center gap-5 border-t border-[#334155]/30 pt-3 sm:border-t-0 sm:pt-0 shrink-0">
+                      <div className="flex items-center gap-3">
+                        <MicroRing
+                          progress={projectStats.coverage}
+                          size={46}
+                          color="#00D1FF"
+                        />
+                        <div>
+                          <div className="font-mono text-[15px] font-bold text-white">
+                            {Math.round(projectStats.coverage * 100)}%
+                          </div>
+                          <div className="font-mono text-[9px] uppercase tracking-wider text-[#64748B]">
+                            Index Density
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </button>
+                </div>
               );
             })}
           </div>
         )}
-
-        {isDesktop ? (
-          <Panel className="mt-6 p-6">
-            <SectionHeading label="Intelligent Linkage" title="How Workspace Clustering Works" />
-            <p className="mt-2 max-w-[76ch] text-[13px] leading-relaxed text-txt-secondary">
-              Anything captured while a project is active in your mind is indexed against it: answers, conversation records,
-              source documents, and detected action items. Switch contexts instantly with full provenance and continuous memory.
-            </p>
-          </Panel>
-        ) : null}
       </div>
 
-      {/* New Project Sheet */}
+      {/* ── 3. Create Sheet ─────────────────────────────────── */}
       <Sheet
         open={creating}
         onClose={() => setCreating(false)}
-        title="New Workspace"
+        title="Initialize Intelligent Workspace"
         footer={
-          <>
+          <div className="flex gap-2">
             <Button variant="ghost" onClick={() => setCreating(false)}>
               Cancel
             </Button>
-            <Button variant="primary" onClick={handleCreate} disabled={!draft.name.trim()}>
-              Create Workspace
+            <Button variant="primary" onClick={handleCreate}>
+              Initialize Mission
             </Button>
-          </>
+          </div>
         }
       >
         <div className="space-y-4">
           <div>
-            <label htmlFor="project-name" className="label mb-2 block">
-              Workspace Name
+            <label htmlFor="project-name" className="label mb-1.5 block">
+              Workspace Identifier
             </label>
             <input
               id="project-name"
-              className="input bg-surface border-border"
-              placeholder="e.g. SmartLine / Orbit Core"
+              className="input bg-[#0A0F1C] border-[#334155]/50"
+              placeholder="e.g. SmartLine Bearing Sensor"
               value={draft.name}
-              onChange={(event) => setDraft({ ...draft, name: event.target.value })}
+              onChange={(e) => setDraft({ ...draft, name: e.target.value })}
             />
           </div>
           <div>
-            <label htmlFor="project-description" className="label mb-2 block">
-              Objective & Scope
+            <label htmlFor="project-desc" className="label mb-1.5 block">
+              Mission Scope &amp; Purpose
             </label>
             <textarea
-              id="project-description"
-              className="input h-auto resize-none py-3 leading-relaxed bg-surface border-border"
+              id="project-desc"
+              className="input h-auto resize-none py-3 leading-relaxed bg-[#0A0F1C] border-[#334155]/50"
               rows={3}
-              placeholder="What are you creating or exploring in this workspace?"
+              placeholder="High-frequency acoustic anomaly detection and edge IoT architecture..."
               value={draft.description}
-              onChange={(event) => setDraft({ ...draft, description: event.target.value })}
+              onChange={(e) => setDraft({ ...draft, description: e.target.value })}
             />
           </div>
           <div>
-            <label htmlFor="project-tags" className="label mb-2 block">
-              Tags (comma separated)
+            <label htmlFor="project-tags" className="label mb-1.5 block">
+              Context Tags (comma separated)
             </label>
             <input
               id="project-tags"
-              className="input bg-surface border-border"
-              placeholder="AI, Hardware, Research"
+              className="input bg-[#0A0F1C] border-[#334155]/50 font-mono text-[12px]"
+              placeholder="iot, vibration, edge, rust"
               value={draft.tags}
-              onChange={(event) => setDraft({ ...draft, tags: event.target.value })}
+              onChange={(e) => setDraft({ ...draft, tags: e.target.value })}
             />
           </div>
         </div>

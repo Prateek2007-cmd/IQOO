@@ -1,9 +1,8 @@
 /**
- * Devices — Pocket Brain and Deep Brain Spatial Ecosystem.
+ * Devices — Hardware Constellation & Local Mesh Network.
  *
- * Pairing is explicit, P2P and local: a device is never shown as connected until a
- * connection is established, and unpaired devices show as disconnected. Nothing
- * here exposes an unauthenticated network endpoint.
+ * Visualized as an encrypted device constellation with direct P2P mesh links,
+ * real-time sync progress rings, and cryptographic status telemetry.
  */
 
 import {
@@ -29,14 +28,11 @@ import { useEffect, useRef, useState } from "react";
 import { MobileTopBar } from "../components/Chrome";
 import {
   Button,
-  Chip,
+  MicroRing,
   Panel,
-  Progress,
-  SectionHeading,
   Sheet,
   StateBlock,
   StatusDot,
-  TechLabel,
 } from "../components/ui";
 import { relativeTime } from "../lib/format";
 import { useIsDesktop, useNow } from "../lib/hooks";
@@ -53,7 +49,7 @@ const STATUS_TONE: Record<DeviceConnectionStatus, "cyan" | "green" | "amber" | "
 };
 
 const STATUS_LABEL: Record<DeviceConnectionStatus, string> = {
-  connecting: "P2P Handshake...",
+  connecting: "P2P Handshake…",
   connected: "Online · Synced",
   syncing: "P2P Synchronizing",
   disconnected: "Offline",
@@ -144,203 +140,233 @@ export default function DevicesPage() {
     updateDevice(device.id, { connectionStatus: "syncing", syncProgress: 0.02 });
   };
 
-  return (
-    <div className="relative">
-      {!isDesktop ? <MobileTopBar title="Devices" tagline="One mind, many devices." /> : null}
+  const bothPaired = state.devices.filter((d) => d.paired).length >= 2;
 
-      <div className={isDesktop ? "mx-auto max-w-[1240px] px-8 py-8" : "px-5 pb-8 pt-5"}>
+  return (
+    <div className="relative min-h-screen text-[#E2E8F0]">
+      {!isDesktop ? <MobileTopBar title="Devices" tagline="Constellation" /> : null}
+
+      <div className={isDesktop ? "mx-auto max-w-[1360px] px-8 py-8" : "px-4 pb-12 pt-4"}>
+        {/* ── 1. Header ───────────────────────────────────────── */}
         {isDesktop ? (
-          <header className="mb-8">
-            <TechLabel tone="cyan">Hardware Ecosystem</TechLabel>
-            <h1 className="mt-2 title-xl">One mind. Distributed across your devices.</h1>
-            <p className="mt-2 max-w-[66ch] text-[13.5px] leading-relaxed text-txt-secondary">
-              Your phone captures spontaneous reality on the go; your laptop indexes, reasons, and builds your persistent
-              second brain. Mutual P2P encryption guarantees your memory never traverses external servers.
-            </p>
+          <header className="mb-6 flex items-end justify-between gap-5">
+            <div>
+              <div className="flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#00D1FF]">
+                <Radio size={12} className="text-[#00D1FF]" />
+                HARDWARE TOPOLOGY
+              </div>
+              <h1 className="mt-1.5 font-display text-[36px] font-bold text-white">
+                One mind. Distributed across devices.
+              </h1>
+              <p className="mt-1 text-[13px] text-[#94A3B8]">
+                Your phone perceives reality in real-time; your laptop indexes, reasons, and builds your persistent memory galaxy.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 font-mono text-[11px] text-[#10B981]">
+              <Lock size={13} />
+              <span>P2P Mutual TLS 1.3 Active</span>
+            </div>
           </header>
         ) : null}
 
-        {/* Global Connection HUD bar */}
-        <div className="mb-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="rounded-2xl border border-border bg-surface/70 p-3.5 backdrop-blur-sm">
-            <div className="flex items-center gap-2 text-[11px] font-mono uppercase text-txt-muted">
-              <Radio size={12} className="text-cyanx animate-pulse" /> P2P Fabric
+        {/* ── 2. Mesh Connection Visualizer Strip ─────────────── */}
+        <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="rounded-2xl border border-[#334155]/40 bg-[#0B1320]/60 p-3.5 backdrop-blur-xl">
+            <div className="flex items-center gap-2 font-mono text-[10px] uppercase text-[#64748B]">
+              <Radio size={12} className="text-[#00D1FF]" /> P2P Mesh
             </div>
-            <div className="mt-2 text-[15px] font-mono font-semibold text-txt-primary">Direct Mesh</div>
-            <div className="text-[10.5px] text-txt-muted">Zero Cloud Relays</div>
+            <div className="mt-1.5 font-mono text-[16px] font-bold text-white">Direct Local Link</div>
+            <div className="font-mono text-[10px] text-[#10B981]">Zero Cloud Relays</div>
           </div>
-          <div className="rounded-2xl border border-border bg-surface/70 p-3.5 backdrop-blur-sm">
-            <div className="flex items-center gap-2 text-[11px] font-mono uppercase text-txt-muted">
-              <Lock size={12} className="text-greenx" /> Encryption
+
+          <div className="rounded-2xl border border-[#334155]/40 bg-[#0B1320]/60 p-3.5 backdrop-blur-xl">
+            <div className="flex items-center gap-2 font-mono text-[10px] uppercase text-[#64748B]">
+              <Lock size={12} className="text-[#10B981]" /> Encryption
             </div>
-            <div className="mt-2 text-[15px] font-mono font-semibold text-txt-primary">mTLS 1.3</div>
-            <div className="text-[10.5px] text-txt-muted">Ephemeral Device Keys</div>
+            <div className="mt-1.5 font-mono text-[16px] font-bold text-white">ChaCha20-Poly1305</div>
+            <div className="font-mono text-[10px] text-[#64748B]">Ephemeral Handshake</div>
           </div>
-          <div className="rounded-2xl border border-border bg-surface/70 p-3.5 backdrop-blur-sm">
-            <div className="flex items-center gap-2 text-[11px] font-mono uppercase text-txt-muted">
-              <ArrowRightLeft size={12} className="text-bluex" /> Sync Delta
+
+          <div className="rounded-2xl border border-[#334155]/40 bg-[#0B1320]/60 p-3.5 backdrop-blur-xl">
+            <div className="flex items-center gap-2 font-mono text-[10px] uppercase text-[#64748B]">
+              <ArrowRightLeft size={12} className="text-[#3882F6]" /> Sync State
             </div>
-            <div className="mt-2 text-[15px] font-mono font-semibold text-txt-primary">0 Queued</div>
-            <div className="text-[10.5px] text-txt-muted">Graph Up to Date</div>
+            <div className="mt-1.5 font-mono text-[16px] font-bold text-[#00D1FF]">
+              {bothPaired ? "Harmonized" : "Local Standalone"}
+            </div>
+            <div className="font-mono text-[10px] text-[#64748B]">
+              {state.memories.filter((m) => !m.deletedAt).length} synchronized
+            </div>
           </div>
-          <div className="rounded-2xl border border-border bg-surface/70 p-3.5 backdrop-blur-sm">
-            <div className="flex items-center gap-2 text-[11px] font-mono uppercase text-txt-muted">
-              <Activity size={12} className="text-purplex" /> Latency
+
+          <div className="rounded-2xl border border-[#334155]/40 bg-[#0B1320]/60 p-3.5 backdrop-blur-xl">
+            <div className="flex items-center gap-2 font-mono text-[10px] uppercase text-[#64748B]">
+              <Activity size={12} className="text-[#885CF6]" /> LAN Latency
             </div>
-            <div className="mt-2 text-[15px] font-mono font-semibold text-txt-primary">&lt; 3.2 ms</div>
-            <div className="text-[10.5px] text-txt-muted">Local LAN Link</div>
+            <div className="mt-1.5 font-mono text-[16px] font-bold text-white">&lt; 2.8 ms</div>
+            <div className="font-mono text-[10px] text-[#64748B]">Subnet Broadcast</div>
           </div>
         </div>
 
-        {/* Primary Hardware Nodes Grid */}
-        <div className="grid gap-5 lg:grid-cols-2">
+        {/* ── 3. Constellation Node Cards ──────────────────────── */}
+        <div className="relative mb-6 grid gap-6 lg:grid-cols-2">
           {state.devices.map((device) => {
             const isDeep = device.processingRole === "deep";
             const isPhone = device.type === "phone";
-            const connected = device.connectionStatus === "connected" || device.connectionStatus === "syncing";
+            const connected =
+              device.connectionStatus === "connected" || device.connectionStatus === "syncing";
 
             return (
               <div
                 key={device.id}
-                className={`group relative overflow-hidden rounded-2xl border p-6 transition-all duration-300 ${
+                className={`relative flex flex-col justify-between overflow-hidden rounded-[24px] border p-6 backdrop-blur-2xl transition-all duration-300 ${
                   isDeep
-                    ? "border-cyanx/35 bg-gradient-to-br from-[#0F1B2D]/90 via-[#0A0F1C]/90 to-[#020407]/90 shadow-[0_0_30px_rgba(0,209,255,0.06)]"
-                    : "border-border bg-gradient-to-br from-surface/80 via-panel/40 to-space/90 hover:border-line-soft"
+                    ? "border-[#00D1FF]/40 bg-gradient-to-b from-[#0F1B2D]/90 via-[#0B1320]/90 to-[#020407]/90 shadow-[0_20px_50px_-20px_rgba(0,209,255,0.15)]"
+                    : "border-[#334155]/50 bg-gradient-to-b from-[#0F1B2D]/60 via-[#0B1320]/60 to-[#020407]/80 hover:border-[#3882F6]/50 shadow-lg"
                 }`}
               >
-                {/* Subtle orbital glow */}
+                {/* Glow backdrop */}
                 <div
-                  className={`pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full blur-3xl opacity-20 ${
-                    isDeep ? "bg-cyanx" : "bg-bluex"
-                  }`}
+                  className="pointer-events-none absolute -right-12 -top-12 h-44 w-44 rounded-full blur-[70px] opacity-25"
+                  style={{ backgroundColor: isDeep ? "#00D1FF" : "#3882F6" }}
                 />
 
-                <div className="relative flex flex-col justify-between h-full">
-                  <div>
-                    {/* Header line: Role + Status */}
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`rounded-full px-2.5 py-0.5 text-[10px] font-mono uppercase tracking-wider font-semibold border ${
-                            isDeep
-                              ? "border-cyanx/40 bg-cyanx/10 text-cyanx"
-                              : "border-bluex/40 bg-bluex/10 text-bluex"
-                          }`}
-                        >
-                          {isDeep ? "Deep Brain Node" : "Pocket Brain Node"}
-                        </span>
-                        <span className="text-[11px] font-mono text-txt-muted">
-                          {isDeep ? "Primary Engine" : "Perception Node"}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-1.5 font-mono text-[11px]">
-                        <StatusDot tone={STATUS_TONE[device.connectionStatus]} pulse={connected} />
-                        <span className="text-txt-secondary">{STATUS_LABEL[device.connectionStatus]}</span>
-                      </div>
+                <div>
+                  {/* Top Bar */}
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`rounded-full border px-2.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider ${
+                          isDeep
+                            ? "border-[#00D1FF]/40 bg-[#00D1FF]/10 text-[#00D1FF]"
+                            : "border-[#3882F6]/40 bg-[#3882F6]/15 text-[#60A5FA]"
+                        }`}
+                      >
+                        {isDeep ? "Deep Brain Node" : "Pocket Brain Node"}
+                      </span>
+                      <span className="font-mono text-[11px] text-[#64748B]">
+                        {isDeep ? "Heavy Reasoning & Graph" : "Real-time Perceiver"}
+                      </span>
                     </div>
 
-                    {/* Device Icon + Titles */}
-                    <div className="mt-5 flex items-start gap-4">
-                      <div className="relative grid h-14 w-14 shrink-0 place-items-center rounded-2xl border border-border bg-panel/70 text-cyanx shadow-inner">
-                        {isPhone ? (
-                          <Smartphone size={26} strokeWidth={1.5} className="text-cyanx" />
-                        ) : device.type === "laptop" ? (
-                          <Laptop size={28} strokeWidth={1.5} className="text-cyanx" />
-                        ) : (
-                          <Tablet size={26} strokeWidth={1.5} className="text-cyanx" />
-                        )}
-                        {connected ? (
-                          <span className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-space border border-greenx">
-                            <span className="h-1.5 w-1.5 rounded-full bg-greenx" />
-                          </span>
-                        ) : null}
-                      </div>
-
-                      <div className="min-w-0 flex-1">
-                        <h2 className="text-[18px] font-semibold text-txt-primary tracking-tight">
-                          {device.name}
-                        </h2>
-                        <p className="text-[12.5px] font-mono text-txt-muted mt-0.5">
-                          {device.model} · Last active {relativeTime(device.lastSeen, now)}
-                        </p>
-                      </div>
+                    <div className="flex items-center gap-2 font-mono text-[11px]">
+                      <StatusDot tone={STATUS_TONE[device.connectionStatus]} pulse={connected} />
+                      <span className="text-[#CBD5E1]">{STATUS_LABEL[device.connectionStatus]}</span>
                     </div>
-
-                    {/* Technical Specs & Processing Capabilities */}
-                    <div className="mt-5 space-y-2 rounded-xl border border-border/60 bg-space/60 p-3.5 font-mono text-[11.5px]">
-                      <div className="flex items-center justify-between text-txt-muted">
-                        <span className="flex items-center gap-1.5">
-                          <Cpu size={12} className="text-cyanx" /> Compute Role:
-                        </span>
-                        <span className="text-txt-primary">
-                          {isDeep ? "Vector Indexing & Graph Inference" : "Microphone & Real-time Perception"}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between text-txt-muted">
-                        <span className="flex items-center gap-1.5">
-                          <HardDrive size={12} className="text-bluex" /> Storage Mode:
-                        </span>
-                        <span className="text-txt-primary">
-                          {isDeep ? "Master Encrypted Local Store" : "Short-term Buffer & Ephemeral Cache"}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Capability Micro-Module Chips */}
-                    <div className="mt-4 flex flex-wrap gap-1.5">
-                      {device.capabilities.map((cap) => (
-                        <span key={cap} className="micro-module text-[10px]">
-                          {cap}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* Syncing Progress Bar */}
-                    {device.connectionStatus === "syncing" ? (
-                      <div className="mt-4 rounded-xl border border-amberx/30 bg-amberx/5 p-3">
-                        <div className="mb-1.5 flex items-center justify-between text-[11px] font-mono text-amberx">
-                          <span>Reconciling vector nodes...</span>
-                          <span className="numeral">{Math.round((device.syncProgress ?? 0) * 100)}%</span>
-                        </div>
-                        <Progress value={device.syncProgress ?? 0} />
-                      </div>
-                    ) : null}
                   </div>
 
-                  {/* Actions Footer */}
-                  <div className="mt-6 pt-4 border-t border-border/60 flex items-center justify-between gap-3">
-                    <span className="text-[11px] font-mono text-txt-muted flex items-center gap-1">
-                      <Wifi size={11} className={connected ? "text-greenx" : "text-txt-muted"} />
-                      {connected ? "Mesh Link Stable" : "Offline"}
-                    </span>
-
-                    <div className="flex items-center gap-2">
-                      {!device.paired ? (
-                        <Button variant="primary" size="sm" onClick={() => startPairing(device)}>
-                          <Zap size={13} /> Pair device
-                        </Button>
+                  {/* Device Header */}
+                  <div className="mt-5 flex items-start gap-4">
+                    <div className="relative grid h-14 w-14 shrink-0 place-items-center rounded-2xl border border-[#334155]/60 bg-[#020407] text-[#00D1FF] shadow-inner">
+                      {isPhone ? (
+                        <Smartphone size={26} strokeWidth={1.6} className="text-[#3882F6]" />
+                      ) : device.type === "laptop" ? (
+                        <Laptop size={28} strokeWidth={1.6} className="text-[#00D1FF]" />
                       ) : (
-                        <>
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            onClick={() => syncNow(device)}
-                            disabled={device.connectionStatus === "syncing"}
-                          >
-                            {device.connectionStatus === "syncing" ? (
-                              <Loader2 size={13} className="animate-spin text-cyanx" />
-                            ) : (
-                              <RefreshCw size={13} />
-                            )}
-                            Sync now
-                          </Button>
-                          <Button size="sm" variant="ghost" onClick={() => disconnect(device)}>
-                            <Unplug size={13} /> Disconnect
-                          </Button>
-                        </>
+                        <Tablet size={26} strokeWidth={1.6} className="text-[#885CF6]" />
+                      )}
+                      {connected && (
+                        <span className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border border-[#10B981] bg-[#020407]">
+                          <span className="h-1.5 w-1.5 rounded-full bg-[#10B981]" />
+                        </span>
                       )}
                     </div>
+
+                    <div className="min-w-0 flex-1">
+                      <h2 className="font-display text-[20px] font-bold text-white tracking-tight">
+                        {device.name}
+                      </h2>
+                      <p className="mt-0.5 font-mono text-[11px] text-[#64748B]">
+                        {device.model} · Active {relativeTime(device.lastSeen, now)}
+                      </p>
+                    </div>
+
+                    {/* Sync progress ring if syncing */}
+                    {device.connectionStatus === "syncing" && (
+                      <div className="flex items-center gap-2 shrink-0">
+                        <MicroRing
+                          progress={device.syncProgress ?? 0.4}
+                          size={36}
+                          color="#F59E0B"
+                        />
+                        <span className="font-mono text-[11px] text-[#F59E0B]">
+                          {Math.round((device.syncProgress ?? 0) * 100)}%
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Technical Roles */}
+                  <div className="mt-5 space-y-2 rounded-xl border border-[#334155]/40 bg-[#020407]/60 p-3.5 font-mono text-[11.5px]">
+                    <div className="flex items-center justify-between">
+                      <span className="flex items-center gap-1.5 text-[#64748B]">
+                        <Cpu size={12} className="text-[#00D1FF]" /> Compute Role:
+                      </span>
+                      <span className="text-[#E2E8F0]">
+                        {isDeep ? "Vector Indexing & Graph Inference" : "Microphone & Low-Power Perception"}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="flex items-center gap-1.5 text-[#64748B]">
+                        <HardDrive size={12} className="text-[#3882F6]" /> Storage:
+                      </span>
+                      <span className="text-[#E2E8F0]">
+                        {isDeep ? "Master Encrypted Local Store" : "Ephemeral Circular Cache"}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Capabilities */}
+                  <div className="mt-3.5 flex flex-wrap gap-1.5 font-mono text-[10px]">
+                    {device.capabilities.map((cap) => (
+                      <span
+                        key={cap}
+                        className="rounded-full border border-[#334155]/50 bg-[#0B1320]/60 px-2.5 py-0.5 text-[#94A3B8]"
+                      >
+                        {cap}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Card Actions Footer */}
+                <div className="mt-6 flex items-center justify-between border-t border-[#334155]/40 pt-4">
+                  <span className="flex items-center gap-1.5 font-mono text-[11px] text-[#64748B]">
+                    <Wifi size={12} className={connected ? "text-[#10B981]" : "text-[#64748B]"} />
+                    {connected ? "Mesh Connection Active" : "Standby Link"}
+                  </span>
+
+                  <div className="flex items-center gap-2">
+                    {!device.paired ? (
+                      <Button variant="primary" size="sm" onClick={() => startPairing(device)}>
+                        <Zap size={13} /> Pair Device
+                      </Button>
+                    ) : (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => syncNow(device)}
+                          disabled={device.connectionStatus === "syncing"}
+                          className="border-[#334155]/50 hover:border-[#00D1FF]/50"
+                        >
+                          {device.connectionStatus === "syncing" ? (
+                            <Loader2 size={13} className="animate-spin text-[#00D1FF]" />
+                          ) : (
+                            <RefreshCw size={13} />
+                          )}
+                          Sync Now
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => disconnect(device)}
+                          className="border-[#334155]/50 hover:border-[#EF4444]/50 hover:text-[#EF4444]"
+                        >
+                          <Unplug size={13} /> Disconnect
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -348,79 +374,94 @@ export default function DevicesPage() {
           })}
         </div>
 
-        {/* Security & Sync Philosophy Matrix */}
-        <div className="mt-6 grid gap-5 lg:grid-cols-2">
-          <Panel className="p-6">
-            <SectionHeading label="Zero Knowledge" title="Local P2P Architecture" />
-            <div className="mt-4 space-y-3.5">
+        {/* ── 4. Cryptographic Security & Offline Continuity ──── */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div className="rounded-[24px] border border-[#334155]/40 bg-[#0B1320]/60 p-6 backdrop-blur-xl">
+            <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#00D1FF]">
+              ✦ SOVEREIGN SECURITY
+            </div>
+            <h3 className="mt-1 font-display text-[18px] font-bold text-white">
+              Zero-Knowledge Mesh Architecture
+            </h3>
+
+            <div className="mt-4 space-y-4">
               {[
                 {
                   icon: ShieldCheck,
-                  title: "Mutual Authentication",
-                  desc: "Devices pair via short cryptographic token verified directly over local Wi-Fi or Bluetooth LE.",
+                  title: "Mutual Device Authentication",
+                  desc: "Devices pair via short ephemeral 6-digit cryptographic PIN verified directly over your local subnet.",
                 },
                 {
                   icon: WifiOff,
-                  title: "Isolated Network Boundary",
-                  desc: "No public IP, port forward, or NAT traversal service is used. Only devices on your local subnet can sync.",
+                  title: "Isolated Network Perimeter",
+                  desc: "No public port forwards, turn servers, or external relays. All vector exchanges stay on your Wi-Fi.",
                 },
                 {
                   icon: Cpu,
                   title: "Autonomous Offline Continuity",
-                  desc: "When separated, both devices function independently. Changes queue locally and merge seamlessly on re-encounter.",
+                  desc: "When traveling with your phone, captures queue locally and reconcile automatically upon returning to your Deep Brain workstation.",
                 },
               ].map((row) => {
                 const Icon = row.icon;
                 return (
-                  <div key={row.title} className="flex gap-3.5">
-                    <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-border bg-panel text-cyanx">
-                      <Icon size={16} strokeWidth={1.7} />
-                    </div>
+                  <div key={row.title} className="flex items-start gap-3.5">
+                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl border border-[#334155]/40 bg-[#020407] text-[#00D1FF]">
+                      <Icon size={15} />
+                    </span>
                     <div>
-                      <div className="text-[13.5px] font-semibold text-txt-primary">{row.title}</div>
-                      <p className="text-[12px] leading-relaxed text-txt-secondary mt-0.5">{row.desc}</p>
+                      <div className="text-[13.5px] font-semibold text-white">{row.title}</div>
+                      <p className="mt-0.5 text-[12px] leading-relaxed text-[#94A3B8]">
+                        {row.desc}
+                      </p>
                     </div>
                   </div>
                 );
               })}
             </div>
-          </Panel>
+          </div>
 
-          <Panel className="p-6">
-            <SectionHeading label="Status & Telemetry" title="Sync Topology Summary" />
+          <div className="rounded-[24px] border border-[#334155]/40 bg-[#0B1320]/60 p-6 backdrop-blur-xl">
+            <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#10B981]">
+              ✦ TOPOLOGY TELEMETRY
+            </div>
+            <h3 className="mt-1 font-display text-[18px] font-bold text-white">
+              Mesh Telemetry Summary
+            </h3>
+
             <div className="mt-4 space-y-3 font-mono text-[12px]">
-              <div className="flex items-center justify-between border-b border-border/50 pb-2.5">
-                <span className="text-txt-muted">PAIRED NODES</span>
-                <span className="text-txt-primary">{state.devices.filter((d) => d.paired).length} of 2</span>
+              <div className="flex items-center justify-between border-b border-[#334155]/30 pb-2.5">
+                <span className="text-[#64748B]">PAIRED NODES</span>
+                <span className="text-white font-semibold">
+                  {state.devices.filter((d) => d.paired).length} of 2 Active
+                </span>
               </div>
-              <div className="flex items-center justify-between border-b border-border/50 pb-2.5">
-                <span className="text-txt-muted">MEMORIES SYNCHRONIZED</span>
-                <span className="text-cyanx">
+              <div className="flex items-center justify-between border-b border-[#334155]/30 pb-2.5">
+                <span className="text-[#64748B]">GRAPH MEMORIES SYNCHRONIZED</span>
+                <span className="text-[#00D1FF] font-semibold">
                   {state.memories.filter((m) => !m.deletedAt).length} entries
                 </span>
               </div>
-              <div className="flex items-center justify-between border-b border-border/50 pb-2.5">
-                <span className="text-txt-muted">ENCRYPTION SUITE</span>
-                <span className="text-txt-secondary">ChaCha20-Poly1305</span>
+              <div className="flex items-center justify-between border-b border-[#334155]/30 pb-2.5">
+                <span className="text-[#64748B]">ENCRYPTION CIPHER</span>
+                <span className="text-[#E2E8F0]">ChaCha20-Poly1305</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-txt-muted">CLOUD TRANSPORT RELIANCE</span>
-                <span className="text-greenx font-semibold">0.0% (DISABLED)</span>
+                <span className="text-[#64748B]">EXTERNAL CLOUD EXPOSURE</span>
+                <span className="text-[#10B981] font-semibold">0.0% (STRICTLY PROHIBITED)</span>
               </div>
             </div>
 
-            <div className="divider my-4" />
-            <StateBlock
-              kind="model"
-              title="Autonomous P2P Prototype"
-              description="Device presence, synchronization telemetry, and pairing handshakes reflect live internal states within this prototype workspace."
-              compact
-            />
-          </Panel>
+            <div className="mt-5 rounded-xl border border-[#334155]/30 bg-[#020407]/50 p-3.5">
+              <div className="text-[12px] font-medium text-white">Encrypted Handshake Protocol</div>
+              <p className="mt-1 text-[11px] leading-relaxed text-[#64748B]">
+                Each device generates an isolated ED25519 keypair. Identity public keys are signed locally during first pairing.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Pairing Confirmation Sheet */}
+      {/* ── 5. Pairing Sheet ─────────────────────────────────── */}
       <Sheet
         open={pairing !== null}
         onClose={() => {
@@ -429,7 +470,7 @@ export default function DevicesPage() {
         }}
         title={`Authenticate ${pairing?.name ?? "Device"}`}
         footer={
-          <>
+          <div className="flex gap-2">
             <Button
               variant="ghost"
               onClick={() => {
@@ -440,25 +481,25 @@ export default function DevicesPage() {
               Cancel
             </Button>
             <Button variant="primary" onClick={confirmPairing}>
-              <Check size={15} /> Confirm pairing
+              <Check size={14} /> Confirm Pairing
             </Button>
-          </>
+          </div>
         }
       >
         <div className="space-y-4">
-          <p className="text-[13px] leading-relaxed text-txt-secondary">
-            Enter this zero-knowledge pairing code on <span className="text-cyanx font-medium">{pairing?.name ?? "the companion device"}</span> to confirm local peer authorization.
+          <p className="text-[13px] leading-relaxed text-[#CBD5E1]">
+            Enter this zero-knowledge verification code on{" "}
+            <span className="text-[#00D1FF] font-medium">{pairing?.name ?? "the companion device"}</span>{" "}
+            to authenticate mutual local access.
           </p>
-          <div className="rounded-2xl border border-cyanx/40 bg-gradient-to-b from-[#0F1B2D] to-space py-6 text-center shadow-[0_0_20px_rgba(0,209,255,0.1)]">
-            <div className="numeral text-[34px] tracking-[0.32em] text-cyanx font-mono font-bold">{code}</div>
-            <div className="mt-2 font-mono text-[11px] text-txt-muted">P2P Ephemeral Token · Valid for 120s</div>
+          <div className="rounded-2xl border border-[#00D1FF]/40 bg-gradient-to-b from-[#0F1B2D] to-[#020407] py-6 text-center shadow-[0_0_25px_rgba(0,209,255,0.15)]">
+            <div className="font-mono text-[36px] font-bold tracking-[0.32em] text-[#00D1FF]">
+              {code}
+            </div>
+            <div className="mt-2 font-mono text-[10.5px] text-[#64748B]">
+              P2P Ephemeral Token · Valid for 120s
+            </div>
           </div>
-          <StateBlock
-            kind="permission"
-            title="Encrypted Local Channel"
-            description="The handshake takes place directly across local network sockets without sending authentication data to an external server."
-            compact
-          />
         </div>
       </Sheet>
     </div>
