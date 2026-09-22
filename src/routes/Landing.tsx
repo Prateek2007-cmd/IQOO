@@ -296,11 +296,11 @@ function Hero() {
         <div
           className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
           style={{
-            width: "clamp(320px, 36vw, 560px)",
-            height: "clamp(45px, 7vh, 85px)",
+            width: "clamp(340px, 38vw, 580px)",
+            height: "clamp(48px, 7.5vh, 90px)",
             bottom: "clamp(55px, 8vh, 95px)",
             background:
-              "radial-gradient(ellipse 65% 55% at 50% 50%, rgba(1, 4, 10, 0.7) 0%, rgba(1, 4, 10, 0.25) 55%, transparent 80%)",
+              "radial-gradient(ellipse 65% 55% at 50% 50%, rgba(1, 4, 10, 0.72) 0%, rgba(1, 4, 10, 0.25) 55%, transparent 80%)",
             filter: "blur(16px)",
           }}
         />
@@ -309,11 +309,11 @@ function Hero() {
         <div
           className="absolute left-1/2 -translate-x-1/2 transition-opacity duration-700 pointer-events-none"
           style={{
-            width: "clamp(460px, 52vw, 840px)",
-            height: "clamp(90px, 12vh, 155px)",
+            width: "clamp(480px, 54vw, 880px)",
+            height: "clamp(95px, 13vh, 165px)",
             bottom: "clamp(50px, 7.5vh, 90px)",
             background:
-              "radial-gradient(ellipse 70% 48% at 50% 50%, rgba(0, 225, 255, 0.22) 0%, rgba(0, 160, 245, 0.07) 50%, transparent 80%)",
+              "radial-gradient(ellipse 70% 48% at 50% 50%, rgba(0, 225, 255, 0.24) 0%, rgba(0, 160, 245, 0.07) 50%, transparent 80%)",
             filter: "blur(24px)",
             opacity: isHovered ? 0.95 : 0.75,
           }}
@@ -323,8 +323,8 @@ function Hero() {
         <div
           className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
           style={{
-            width: "clamp(380px, 44vw, 640px)",
-            height: "clamp(240px, 30vh, 380px)",
+            width: "clamp(390px, 46vw, 660px)",
+            height: "clamp(250px, 32vh, 400px)",
             bottom: "clamp(60px, 8.5vh, 105px)",
             background:
               "radial-gradient(ellipse 55% 85% at 50% 100%, rgba(0, 215, 255, 0.14) 0%, rgba(0, 140, 240, 0.04) 60%, transparent 85%)",
@@ -336,12 +336,12 @@ function Hero() {
         <div
           className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-700 pointer-events-none"
           style={{
-            top: "55.5%",
-            width: "clamp(680px, 66vw, 1080px)",
-            height: "clamp(680px, 66vw, 1080px)",
+            top: "55%",
+            width: "clamp(720px, 68vw, 1140px)",
+            height: "clamp(720px, 68vw, 1140px)",
             background:
               "radial-gradient(circle at 50% 50%, rgba(0, 210, 255, 0.09) 0%, rgba(0, 140, 230, 0.03) 45%, transparent 70%)",
-            filter: "blur(54px)",
+            filter: "blur(56px)",
             opacity: isHovered ? 1 : 0.8,
           }}
         />
@@ -362,6 +362,7 @@ function Hero() {
       {/* =========================================================================
           LAYER 4: The real interactive NeoBrainCore
           - Enlarged to a dominant, commanding visual presence
+          - Full 360° interactive drag rotation & physical responsiveness
           - Floats naturally above the central circular floor platform
           - Horizontally centered, responsive, uninhibited 3D interactivity
           ========================================================================= */}
@@ -372,18 +373,18 @@ function Hero() {
         <div
           style={{
             position: "absolute",
-            top: "55.5%",
+            top: "55%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: "clamp(960px, 92vw, 1480px)",
-            height: "clamp(960px, 92vw, 1480px)",
+            width: "clamp(1040px, 96vw, 1600px)",
+            height: "clamp(1040px, 96vw, 1600px)",
           }}
           className="flex items-center justify-center pointer-events-none"
         >
           <div
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
-            className="pointer-events-auto relative group cursor-pointer w-full h-full transition-transform duration-500 hover:scale-[1.02]"
+            className="pointer-events-auto relative group cursor-grab active:cursor-grabbing w-full h-full transition-transform duration-300 select-none"
           >
             <NeoBrainCore
               state={coreState}

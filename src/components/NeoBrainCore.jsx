@@ -1512,30 +1512,57 @@ function CoreScene({
 
     root.current.position.y =
       reducedMotion
-        ? 0
-        : Math.sin(
-            m.time * 0.55
-          ) * 0.035;
+    const inp = input.current;
 
-    root.current.rotation.y =
-      THREE.MathUtils.damp(
-        root.current.rotation.y,
-        reducedMotion
-          ? 0
-          : input.current.x * 0.085,
-        2.7,
-        dt
-      );
+    // Apply inertia and continuous ambient auto-rotation when not actively dragging
+    if (!inp.isDragging) {
+      inp.velX = (inp.velX || 0) * 0.94;
+      inp.velY = (inp.velY || 0) * 0.94;
+      inp.rotY = (inp.rotY || 0) + inp.velY + (reducedMotion ? 0 : 0.003 * m.rate);
+      inp.rotX = (inp.rotX || 0) + inp.velX;
+      inp.dispX = THREE.MathUtils.damp(inp.dispX || 0, 0, 4.0, dt);
+      inp.dispY = THREE.MathUtils.damp(inp.dispY || 0, 0, 4.0, dt);
+    }
 
-    root.current.rotation.x =
-      THREE.MathUtils.damp(
-        root.current.rotation.x,
-        reducedMotion
-          ? 0
-          : -input.current.y * 0.055,
-        2.7,
-        dt
-      );
+    // Clamp vertical pitch tilt so Core remains aesthetically oriented
+    inp.rotX = clamp(inp.rotX || 0, -1.3, 1.3);
+
+    // Dynamic rotation: accumulated drag rotation + hover parallax tilt
+    const targetRotY = inp.rotY + (reducedMotion ? 0 : inp.x * 0.08);
+    const targetRotX = inp.rotX + (reducedMotion ? 0 : -inp.y * 0.06);
+
+    root.current.rotation.y = THREE.MathUtils.damp(
+      root.current.rotation.y,
+      targetRotY,
+      inp.isDragging ? 22 : 6,
+      dt
+    );
+
+    root.current.rotation.x = THREE.MathUtils.damp(
+      root.current.rotation.x,
+      targetRotX,
+      inp.isDragging ? 22 : 6,
+      dt
+    );
+
+    // Dynamic position: base floating sine + hover tracking + interactive drag displacement
+    const floatY = reducedMotion ? 0 : Math.sin(m.time * 0.55) * 0.035;
+    const targetPosX = (inp.dispX || 0) + (reducedMotion ? 0 : inp.x * 0.07);
+    const targetPosY = floatY + (inp.dispY || 0) + (reducedMotion ? 0 : inp.y * 0.05);
+
+    root.current.position.x = THREE.MathUtils.damp(
+      root.current.position.x,
+      targetPosX,
+      inp.isDragging ? 16 : 4,
+      dt
+    );
+
+    root.current.position.y = THREE.MathUtils.damp(
+      root.current.position.y,
+      targetPosY,
+      inp.isDragging ? 16 : 4,
+      dt
+    );
 
     const breathe = reducedMotion
       ? 1
@@ -1558,26 +1585,8 @@ function CoreScene({
       m.amplitude * 0.1;
   });
 
-  const activate = (e) => {
-    e.stopPropagation();
-
-    input.current.pressed = true;
-    input.current.trigger++;
-
-    e.target.setPointerCapture?.(
-      e.pointerId
-    );
-
-    onEngage?.();
-  };
-
-  const release = (e) => {
-    input.current.pressed = false;
-
-    e.target.releasePointerCapture?.(
-      e.pointerId
-    );
-  };
+  const activate = () => {};
+  const release = () => {};
 
   return (
     <>
@@ -1830,11 +1839,23 @@ export default function NeoBrainCore({
     trigger: 0,
     x: 0,
     y: 0,
+    isDragging: false,
+    rotX: 0,
+    rotY: 0,
+    velX: 0,
+    velY: 0,
+    dispX: 0,
+    dispY: 0,
+    lastX: 0,
+    lastY: 0,
+    startX: 0,
+    startY: 0,
   });
 
   useEffect(() => {
     const release = () => {
       input.current.pressed = false;
+      input.current.isDragging = false;
     };
 
     window.addEventListener(
@@ -1876,6 +1897,64 @@ export default function NeoBrainCore({
       role="group"
       aria-label={ariaLabel}
       tabIndex={0}
+      onPointerDown={(e) => {
+        input.current.isDragging = true;
+        input.current.pressed = true;
+        input.current.lastX = e.clientX;
+        input.current.lastY = e.clientY;
+        input.current.startX = e.clientX;
+        input.current.startY = e.clientY;
+        input.current.velX = 0;
+        input.current.velY = 0;
+        e.currentTarget.setPointerCapture?.(e.pointerId);
+      }}
+      onPointerMove={(e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        input.current.x = clamp(((e.clientX - rect.left) / rect.width) * 2 - 1, -1, 1);
+        input.current.y = clamp(-(((e.clientY - rect.top) / rect.height) * 2 - 1), -1, 1);
+
+        if (input.current.isDragging) {
+          const dx = e.clientX - input.current.lastX;
+          const dy = e.clientY - input.current.lastY;
+          input.current.lastX = e.clientX;
+          input.current.lastY = e.clientY;
+
+          const sens = 0.0075;
+          input.current.rotY += dx * sens;
+          input.current.rotX += dy * sens;
+          input.current.velY = dx * sens;
+          input.current.velX = dy * sens;
+
+          input.current.dispX = clamp((input.current.dispX || 0) + dx * 0.0012, -0.45, 0.45);
+          input.current.dispY = clamp((input.current.dispY || 0) - dy * 0.0012, -0.35, 0.35);
+        }
+      }}
+      onPointerUp={(e) => {
+        const dist = Math.hypot(e.clientX - input.current.startX, e.clientY - input.current.startY);
+        input.current.isDragging = false;
+        input.current.pressed = false;
+        e.currentTarget.releasePointerCapture?.(e.pointerId);
+
+        if (dist < 8) {
+          input.current.trigger++;
+          onEngage?.();
+        }
+      }}
+      onPointerCancel={(e) => {
+        input.current.isDragging = false;
+        input.current.pressed = false;
+        e.currentTarget.releasePointerCapture?.(e.pointerId);
+      }}
+      onPointerEnter={() => {
+        input.current.hover = true;
+      }}
+      onPointerLeave={() => {
+        input.current.hover = false;
+        if (!input.current.isDragging) {
+          input.current.x = 0;
+          input.current.y = 0;
+        }
+      }}
       onKeyDown={(e) => {
         if (
           (e.key === 'Enter' ||
@@ -1901,6 +1980,7 @@ export default function NeoBrainCore({
       }}
       onBlur={() => {
         input.current.pressed = false;
+        input.current.isDragging = false;
       }}
       style={{
         width: '100%',
@@ -1911,6 +1991,9 @@ export default function NeoBrainCore({
           'radial-gradient(circle at 50% 45%, #0b1b28 0%, #03070b 42%, #000 100%)',
         borderRadius: 28,
         overflow: 'hidden',
+        touchAction: 'none',
+        userSelect: 'none',
+        cursor: 'grab',
         ...style,
       }}
     >
@@ -1936,7 +2019,8 @@ export default function NeoBrainCore({
           width: '100%',
           height: '100%',
           display: 'block',
-          touchAction: 'pan-y',
+          touchAction: 'none',
+          pointerEvents: 'none',
         }}
         onCreated={(context) => {
           context.gl.setClearColor(
